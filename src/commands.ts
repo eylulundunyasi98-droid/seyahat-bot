@@ -1,14 +1,7 @@
 import { Env } from './index';
-import { addFavorite } from './db';
+import { sendTelegram } from './telegram';
 import { searchFlights, getHotelLink, getCarLink } from './api';
-
-async function sendTelegram(env: Env, chatId: number, text: string) {
-  await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML' }),
-  });
-}
+import { addFavorite } from './db';
 
 export async function handleMessage(message: any, env: Env) {
   const chatId = message.chat.id;
@@ -29,11 +22,11 @@ export async function handleMessage(message: any, env: Env) {
 
   if (text.includes('-')) {
     const [from, to] = text.split('-').map(s => s.trim());
-    const flightLinks = await searchFlights(env, from, to);
-    const hotelLink = await getHotelLink(env, from, to);
-    const carLink = await getCarLink(env, from, to);
+    const flightLink = await searchFlights(env, from, to);
+    const hotelLink = await getHotelLink(env, to);
+    const carLink = await getCarLink(env);
     
-    const reply = `✈️ Uçuş Fırsatları:\n${flightLinks}\n\n🏨 Otel:\n${hotelLink}\n\n🚗 Araç Kiralama:\n${carLink}`;
+    const reply = `✈️ Uçuş: ${flightLink}\n\n🏨 Otel: ${hotelLink}\n\n🚗 Araç: ${carLink}`;
     await sendTelegram(env, chatId, reply);
     return;
   }

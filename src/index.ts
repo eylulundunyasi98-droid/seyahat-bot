@@ -1,5 +1,4 @@
 import { handleMessage } from './commands';
-import cronHandler from './cron';
 
 export interface Env {
   DB: D1Database;
@@ -18,9 +17,5 @@ export default {
       return new Response('OK');
     }
     return new Response('OK');
-  },
-
-  async scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext) {
-    await cronHandler(env);
   }
 };

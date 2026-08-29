@@ -6,14 +6,7 @@ export async function addFavorite(env: Env, userId: number, route: string) {
     .run();
 }
 
-export async function getFavorites(env: Env, userId: number) {
-  const result = await env.DB.prepare('SELECT route FROM favorites WHERE user_id = ?')
-    .bind(userId)
-    .all();
-  return result.results.map((r: any) => r.route);
-}
-
-export async function getAllFavorites(env: Env) {
-  const result = await env.DB.prepare('SELECT user_id, route FROM favorites').all();
-  return result.results as { user_id: number; route: string }[];
+export async function getFavorites(env: Env) {
+  const { results } = await env.DB.prepare('SELECT * FROM favorites').all();
+  return results;
 }

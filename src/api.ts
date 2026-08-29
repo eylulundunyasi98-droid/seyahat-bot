@@ -19,17 +19,16 @@ async function createAffiliateLink(env: Env, url: string): Promise<string> {
 }
 
 export async function searchFlights(env: Env, from: string, to: string): Promise<string> {
-  const searchUrl = `https://www.aviasales.com/search?origin=${encodeURIComponent(from)}&destination=${encodeURIComponent(to)}`;
-  const affiliate = await createAffiliateLink(env, searchUrl);
-  return affiliate;
+  const searchUrl = `https://www.aviasales.com/search?origin=${from}&destination=${to}`;
+  return await createAffiliateLink(env, searchUrl);
 }
 
-export async function getHotelLink(env: Env, from: string, to: string): Promise<string> {
-  const hotelUrl = `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(to)}`;
+export async function getHotelLink(env: Env, to: string): Promise<string> {
+  const hotelUrl = `https://www.booking.com/searchresults.html?ss=${to}`;
   return await createAffiliateLink(env, hotelUrl);
 }
 
-export async function getCarLink(env: Env, from: string, to: string): Promise<string> {
+export async function getCarLink(env: Env): Promise<string> {
   const carUrl = `https://www.rentalcars.com/`;
   return await createAffiliateLink(env, carUrl);
 }
