@@ -151,7 +151,7 @@ function header(): string {
 }
 
 function footer(): string {
-  return `<footer class="foot"><div class="wrap" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px"><div>© 2026 Seyahat Rehberi — Dürüst ve özgün gezi yazıları.</div><div><a href="/blog">Blog</a> • <a href="/sitemap">Sitemap</a> • <a href="/robots.txt">Robots</a></div></div></footer>`;
+  return `<footer class="foot"><div class="wrap" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px"><div>© 2026 Seyahat Rehberi — Dürüst ve özgün gezi yazıları.</div><div><a href="/blog">Blog</a> • <a href="/sitemap">Sitemap</a></div></div></footer>`;
 }
 
 const style = `<style>
@@ -350,5 +350,5 @@ export function renderSitemapHTML(): string {
   .wrap{max-width:800px;margin:0 auto;padding:24px 20px}
   .card{background:var(--card);border:1px solid var(--line);border-radius:14px;margin:10px 0}
   .meta{color:var(--muted);font-size:12px}
-  `}</style></head><body>${header()}<div class="wrap"><h1>🗺️ Sitemap</h1><p style="color:var(--muted)">İnsanlar için liste — botlar için <a href="/sitemap.xml">/sitemap.xml</a> (XML)</p><div style="display:grid;gap:10px">${list}</div><p style="margin-top:18px"><a href="/robots.txt">robots.txt</a> • <a href="/">Ana sayfa</a></p></div>${footer()}</body></html>`;
+  `}</style></head><body>${header()}<div class="wrap"><h1>🗺️ Sitemap</h1><p style="color:var(--muted)">İnsanlar için liste — botlar için <a href="/sitemap.xml">/sitemap.xml</a> (XML)</p><div style="display:grid;gap:10px">${list}</div><p style="margin-top:18px"><a href="/">Ana sayfa</a> • <a href="/blog">Blog</a></p></div>${footer()}</body></html>`;
 }
