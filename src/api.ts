@@ -322,14 +322,30 @@ export async function getWeather(city: string): Promise<{
   current?: { temperature: number; weathercode: number; windspeed: number };
   daily?: { time: string[]; temperature_2m_max: number[]; temperature_2m_min: number[]; weathercode: number[] };
 } | null> {
-  const coords = getCityCoords(city);
+  let coords = getCityCoords(city);
+  // Fallback: Nominatim ile dünya geneli şehir ara (free, kotasız)
+  if (!coords) {
+    try {
+      const nom = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(city)}&format=json&limit=1`, {
+        headers: { 'User-Agent': 'SeyahatBot/1.0 (contact@seyahat-bot.workers.dev)', 'Accept-Language': 'tr' },
+      });
+      if (nom.ok) {
+        const arr = await nom.json() as any[];
+        if (arr && arr.length > 0) {
+          coords = { lat: parseFloat(arr[0].lat), lon: parseFloat(arr[0].lon), name: (arr[0].display_name || city).split(',')[0].trim() };
+        }
+      }
+    } catch (e) { console.error('Nominatim error', e); }
+  }
   if (!coords) return null;
 
   try {
     const url = `${OPEN_METEO_API}?latitude=${coords.lat}&longitude=${coords.lon}&current=temperature_2m,weather_code,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,weather_code&timezone=auto&forecast_days=3`;
     const res = await fetch(url);
     if (!res.ok) return null;
-    return await res.json();
+    const data: any = await res.json();
+    // Open-Meteo bazen current/daily farklı isimlendirse de normalize et
+    return data;
   } catch (e) {
     console.error('Weather API error:', e);
     return null;

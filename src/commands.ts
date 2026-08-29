@@ -156,7 +156,27 @@ export async function handleMessage(message: any, env: Env): Promise<void> {
 
     // === KOMUTLAR ===
     if (text.startsWith('/start')) {
-      await sendTelegram(env, chatId, UI.welcomeCaption(message.from?.first_name || '', lang), createMainMenuKeyboard(lang));
+      // Referral: /start ref123456 veya /start 123456
+      const payload = text.split(' ')[1]?.trim();
+      if (payload) {
+        const refStr = payload.replace(/^ref/i, '');
+        const refId = parseInt(refStr);
+        if (refId && refId !== chatId && !isNaN(refId)) {
+          const ok = await DB.addReferral(env, refId, chatId);
+          if (ok) {
+            try { await sendTelegram(env, refId, `🎉 <b>Tebrikler!</b> ${message.from?.first_name || 'Bir arkadaşın'} senin linkinle katıldı! Toplam davetin: ${await DB.getReferralCount(env, refId) + 1}`); } catch {}
+          }
+        }
+      }
+      const myRef = `https://t.me/avcisi_firsat_bot?start=ref${chatId}`;
+      const count = await DB.getReferralCount(env, chatId);
+      await sendTelegram(env, chatId, UI.welcomeCaption(message.from?.first_name || '', lang) + `\n\n🔗 <b>Davet linkin:</b> ${myRef}\n👥 Davet ettiklerin: <b>${count}</b> — 3 arkadaş getir, gizli rotalar açılsın!`, createMainMenuKeyboard(lang));
+      return;
+    }
+    if (text.startsWith('/davet') || text.startsWith('/referral') || text.startsWith('/invite')) {
+      const myRef = `https://t.me/avcisi_firsat_bot?start=ref${chatId}`;
+      const count = await DB.getReferralCount(env, chatId);
+      await sendTelegram(env, chatId, `🔗 <b>Davet Linkin</b>\n${myRef}\n\n👥 Toplam davet: <b>${count}</b>\n🎁 3 arkadaş = gizli rotalar + öncelikli alarm\n\nPaylaş:`, createInlineKeyboard([[{ text: '📢 Arkadaşlara Gönder', url: myRef }]]));
       return;
     }
     if (text.startsWith('/help') || text.startsWith('/yardim') || text.startsWith('/hilfe')) {

@@ -227,6 +227,27 @@ export async function getShareStats(env: Env): Promise<any> {
   `).first();
 }
 
+// Referral sistemi
+export async function addReferral(env: Env, referrerId: number, referredId: number): Promise<boolean> {
+  if (referrerId === referredId) return false;
+  const exists: any = await env.DB.prepare('SELECT 1 FROM referrals WHERE referred_id = ?').bind(referredId).first();
+  if (exists) return false;
+  try {
+    await env.DB.prepare('INSERT INTO referrals (referrer_id, referred_id) VALUES (?, ?)').bind(referrerId, referredId).run();
+    return true;
+  } catch { return false; }
+}
+
+export async function getReferralCount(env: Env, userId: number): Promise<number> {
+  const row: any = await env.DB.prepare('SELECT COUNT(*) as c FROM referrals WHERE referrer_id = ?').bind(userId).first();
+  return row?.c || 0;
+}
+
+export async function hasReferred(env: Env, referredId: number): Promise<boolean> {
+  const row: any = await env.DB.prepare('SELECT 1 FROM referrals WHERE referred_id = ?').bind(referredId).first();
+  return !!row;
+}
+
 // Çeviri cache
 export async function getTranslation(key: string, lang: string, env: Env): Promise<string | null> {
   const result: any = await env.DB.prepare('SELECT value FROM translations_cache WHERE key = ? AND language = ?')
