@@ -261,18 +261,18 @@ export function createTravelKeyboard(flightLink: string, hotelLink: string, carL
     buttons.push([{ text: '🎯 Aktiviteler', url: activityLink }]);
   }
   buttons.push([{ text: '📢 Arkadaşlara Gönder', switch_inline_query: '' }]);
-  // Şeffaf kanal butonu - her sorguda
-  buttons.push([{ text: '✈️ Kanalımız', url: 'https://t.me/avcisi_firsat_bot' }]);
+  // Şeffaf kanal butonu - her sorguda (normal kanal)
+  buttons.push([{ text: '✈️ Kanalımız', url: 'https://t.me/+TKQphsxQyIRhYjBk' }]);
   return { inline_keyboard: buttons };
 }
 
 export function createSingleButtonKeyboard(text: string, url: string): ReplyMarkup {
-  return { inline_keyboard: [[{ text, url }], [{ text: '✈️ Kanalımız', url: 'https://t.me/avcisi_firsat_bot' }]] };
+  return { inline_keyboard: [[{ text, url }], [{ text: '✈️ Kanalımız', url: 'https://t.me/+TKQphsxQyIRhYjBk' }]] };
 }
 
 export function withChannelButton(keyboard: ReplyMarkup): ReplyMarkup {
   const ik = keyboard.inline_keyboard || [];
-  return { inline_keyboard: [...ik, [{ text: '✈️ Kanalımız', url: 'https://t.me/avcisi_firsat_bot' }]] };
+  return { inline_keyboard: [...ik, [{ text: '✈️ Kanalımız', url: 'https://t.me/+TKQphsxQyIRhYjBk' }]] };
 }
 
 export function createMainMenuKeyboard(lang: string = 'tr'): ReplyMarkup {
