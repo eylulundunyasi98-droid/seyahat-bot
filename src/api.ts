@@ -387,33 +387,38 @@ function weatherCodeToText(code: number, lang: string = 'tr'): string {
 }
 
 export function formatWeather(weather: any, cityName: string, lang: string = 'tr'): string {
-  if (!weather || !weather.daily) {
+  if (!weather || !weather.daily || !weather.daily.time) {
     return lang === 'tr' 
       ? `🌤️ ${cityName} için hava durumu bilgisi alınamadı.`
       : `🌤️ Weather data unavailable for ${cityName}.`;
   }
-
   const daily = weather.daily;
+  // Open-Meteo yeni API: weather_code, eski: weathercode — ikisini de destekle
+  const getDailyCode = (i: number) => daily.weather_code?.[i] ?? daily.weathercode?.[i] ?? 0;
+  const getCurrent = () => {
+    const c = weather.current || weather.current_weather || {};
+    return {
+      temp: c.temperature_2m ?? c.temperature ?? c.temp ?? 0,
+      code: c.weather_code ?? c.weathercode ?? c.weathercode ?? 0,
+    };
+  };
   const lines = [lang === 'tr' ? `🌤️ <b>${cityName} - 3 Günlük Hava Tahmini</b>` : `🌤️ <b>${cityName} - 3-Day Forecast</b>`];
-  
   for (let i = 0; i < Math.min(3, daily.time.length); i++) {
     const date = new Date(daily.time[i]).toLocaleDateString(lang === 'tr' ? 'tr-TR' : lang === 'de' ? 'de-DE' : 'en-US', { weekday: 'short', day: 'numeric', month: 'short' });
-    const max = Math.round(daily.temperature_2m_max[i]);
-    const min = Math.round(daily.temperature_2m_min[i]);
-    const code = daily.weathercode[i];
+    const max = Math.round(daily.temperature_2m_max?.[i] ?? 0);
+    const min = Math.round(daily.temperature_2m_min?.[i] ?? 0);
+    const code = getDailyCode(i);
     const emoji = weatherCodeToEmoji(code);
     const text = weatherCodeToText(code, lang);
     lines.push(`${emoji} ${date}: ${min}°C - ${max}°C ${text}`);
   }
-  
-  if (weather.current) {
-    const curr = weather.current;
+  const cur = getCurrent();
+  if (cur.temp !== 0 || cur.code !== 0) {
     lines.unshift(lang === 'tr' 
-      ? `🌡️ Şu an: ${Math.round(curr.temperature)}°C ${weatherCodeToEmoji(curr.weathercode)} ${weatherCodeToText(curr.weathercode, lang)}`
-      : `🌡️ Now: ${Math.round(curr.temperature)}°C ${weatherCodeToEmoji(curr.weathercode)} ${weatherCodeToText(curr.weathercode, lang)}`
+      ? `🌡️ Şu an: ${Math.round(cur.temp)}°C ${weatherCodeToEmoji(cur.code)} ${weatherCodeToText(cur.code, lang)}`
+      : `🌡️ Now: ${Math.round(cur.temp)}°C ${weatherCodeToEmoji(cur.code)} ${weatherCodeToText(cur.code, lang)}`
     );
   }
-  
   return lines.join('\n');
 }
 
