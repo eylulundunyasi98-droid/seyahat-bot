@@ -6,3 +6,6 @@ compatibility_date = "2026-08-29"
 binding = "DB"
 database_name = "travel_db"
 database_id = "28c617c1-e1ae-410e-9f29-89c0b3897b57"
+
+[triggers]
+crons = ["0 */6 * * *"]
