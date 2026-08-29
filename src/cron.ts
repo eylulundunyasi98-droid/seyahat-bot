@@ -1,8 +1,9 @@
-// src/cron.ts - Zamanlanmış görevler
+// src/cron.ts - Zamanlanmış görevler + UI + güvenlik
 import { Env } from './index';
 import { CHANNEL_ID, GLOBAL_TRENDING_ROUTES } from './constants';
 import { searchFlights, getHotelLink, getCarLink, getActivitiesLink, getDestinationImage, getCityCode } from './api';
 import { sendPhoto, sendToChannel, createTravelKeyboard, createSingleButtonKeyboard } from './telegram';
+import * as UI from './ui';
 import * as DB from './db';
 
 function randomRoute(): string {
@@ -55,12 +56,11 @@ export async function checkPriceAlerts(env: Env): Promise<void> {
         const [from, to] = alert.route.split('-').map((s: string) => s.trim());
         const flightLink = await searchFlights(env, from, to, currency);
         const photo = await getDestinationImage(to);
-        const caption = `🚨 <b>FİYAT DÜŞTÜ!</b>\n\n📍 <b>${alert.route}</b>\n🎯 Hedef: <b>${alert.target_price} ${currency}</b>\n💰 Şimdi: <b>${current} ${currency}</b>\n\n⏰ Hemen yakala!`;
+        const caption = UI.alertCaption(alert.route, alert.target_price, current, currency);
         const kb = createSingleButtonKeyboard('✈️ Hemen Al', flightLink);
         await sendPhoto(env, alert.user_id, photo, caption, kb).catch(async () => {
           await sendToChannel(env, `🚨 Alarm: ${alert.route} ${current} ${currency} (hedef ${alert.target_price}) -> user ${alert.user_id}`);
         });
-        // Tek seferlik tetikle (spam önleme)
         await DB.triggerPriceAlert(env, alert.id);
         await sendToChannel(env, `📉 Alarm tetiklendi: ${alert.route} ${current} ${currency} ≤ ${alert.target_price} (user ${alert.user_id})`);
       }
@@ -101,11 +101,10 @@ export async function sendDailyDigest(env: Env): Promise<void> {
 
     await DB.saveDailyCoupon(env, { route, price, currency, flightLink, hotelLink, carLink }).catch(() => {});
 
-    const caption = `🔥 <b>GÜNÜN KÜRESEL BOMBASI!</b> ${today}\n\n📍 <b>${route}</b>\n💰 Sadece <b>${price} ${currency}</b> (normal ~${Math.round(price * 1.6)} ${currency})\n\n⏳ <i>Sadece bugün geçerli!</i>\n👇 Hemen yakala:`;
+    const caption = UI.dailyCaption(route, price, currency, today);
     const kb = createTravelKeyboard(flightLink, hotelLink, carLink, activityLink);
     await sendPhoto(env, CHANNEL_ID, photo, caption, kb);
-    // Kanala ek metin de gönder (yedek)
-    await sendToChannel(env, `📢 Arkadaşlarınla paylaş: @${env.TELEGRAM_BOT_TOKEN ? 'avcisi_firsat_bot' : 'bot'} ile <code>${route}</code> yaz!`);
+    await sendToChannel(env, `📢 Arkadaşlarınla paylaş: @avcisi_firsat_bot ile <code>${route}</code> yaz!`);
   } catch (e) {
     console.error('dailyDigest', e);
   }

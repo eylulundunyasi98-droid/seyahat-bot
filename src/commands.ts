@@ -1,18 +1,21 @@
-// src/commands.ts - Tüm komut işleyicileri
+// src/commands.ts - Tüm komut işleyicileri (kibar + şeffaf + görsel)
 import { Env } from './index';
 import {
   sendTelegram,
   sendPhoto,
   sendToChannel,
+  sendChatAction,
   createTravelKeyboard,
   createSingleButtonKeyboard,
   createMainMenuKeyboard,
   createLanguageKeyboard,
   createCurrencyKeyboard,
   createInlineKeyboard,
+  createExploreKeyboard,
   answerCallbackQuery,
   getFile,
 } from './telegram';
+import * as UI from './ui';
 import {
   getCityCode,
   getCityCoords,
@@ -84,6 +87,7 @@ export async function handleMessage(message: any, env: Env): Promise<void> {
   const normalizedLang = ['tr', 'en', 'de'].includes(userLangRaw) ? userLangRaw : 'tr';
 
   try {
+    await sendChatAction(env, chatId, 'typing');
     // Kullanıcıyı kaydet/güncelle
     await DB.upsertUser(env, {
       user_id: chatId,
@@ -108,11 +112,11 @@ export async function handleMessage(message: any, env: Env): Promise<void> {
 
     // === KOMUTLAR ===
     if (text.startsWith('/start')) {
-      await sendTelegram(env, chatId, (t.welcome as any)[lang] || t.welcome.tr, createMainMenuKeyboard(lang));
+      await sendTelegram(env, chatId, UI.welcomeCaption(message.from?.first_name || '', lang), createMainMenuKeyboard(lang));
       return;
     }
     if (text.startsWith('/help') || text.startsWith('/yardim') || text.startsWith('/hilfe')) {
-      await sendTelegram(env, chatId, (t.help as any)[lang] || t.help.tr, createMainMenuKeyboard(lang));
+      await sendTelegram(env, chatId, UI.helpCaption(lang), createMainMenuKeyboard(lang));
       return;
     }
     if (text.startsWith('/dil') || text.startsWith('/lang') || text.startsWith('/sprache')) {
@@ -139,7 +143,7 @@ export async function handleMessage(message: any, env: Env): Promise<void> {
         await DB.addPriceAlert(env, chatId, route, price, c);
       }
       await DB.addFavorite(env, chatId, route, price || undefined);
-      await sendTelegram(env, chatId, `✅ Takip ediliyor: <b>${route}</b>${price ? ` (hedef: ${formatCurrency(price, c, lang)})` : ''}\nFiyat düşerse haber vereceğim.`);
+      await sendTelegram(env, chatId, UI.trackingAdded(route, lang) + (price ? ` (hedef: ${formatCurrency(price, c, lang)})` : ''));
       try { await sendToChannel(env, `🔔 <b>Yeni takip:</b> ${route}${price ? ` - ${price} ${c}` : ''} (user: ${chatId})`); } catch {}
       return;
     }
@@ -207,41 +211,34 @@ export async function handleMessage(message: any, env: Env): Promise<void> {
       }
     }
 
-    // Fallback
-    await sendTelegram(env, chatId, (t.unknown as any)[lang] || t.unknown.tr, createMainMenuKeyboard(lang));
+    // Fallback kibar
+    await sendTelegram(env, chatId, UI.politeError(lang), createMainMenuKeyboard(lang));
   } catch (e) {
     console.error('handleMessage error', e, text);
-    try { await sendTelegram(env, chatId, `⚠️ Bir hata oluştu. Lütfen tekrar dene. /yardim`); } catch {}
+    try { await sendTelegram(env, chatId, `⚠️ Bir aksaklık oldu, hemen düzeltiyorum. Lütfen bir kez daha deneyin. /yardim`); } catch {}
   }
 }
 
 function handleMenuButtons(text: string, env: Env, chatId: number, lang: string, currency: string): boolean {
-  // true dönerse handle edildi demektir, handleMessage return etmeli
   const map: Record<string, () => Promise<void>> = {
-    '🧭 Rota Ara': async () => { await sendTelegram(env, chatId, lang === 'tr' ? `✈️ Rota yaz (örn: <code>İstanbul - Paris</code> veya <code>New York - Tokyo</code>)` : `✈️ Type route (e.g. <code>London - Paris</code>)`); },
-    '🧭 Search Route': async () => { await sendTelegram(env, chatId, `✈️ Type route (e.g. <code>London - Paris</code>)`); },
-    '🧭 Route Suchen': async () => { await sendTelegram(env, chatId, `✈️ Route eingeben (z.B. <code>Berlin - Paris</code>)`); },
-    '🔥 Günün Fırsatı': async () => { await handleDailyDeal(env, chatId, lang, currency); },
+    '🧭 Rota Ara': async () => { await sendTelegram(env, chatId, lang === 'tr' ? `✈️ Rota yaz lütfen: <code>İstanbul - Paris</code> veya <code>New York - Tokyo</code>\nÖrnekleri kopyalayıp gönderebilirsin.` : `✈️ Type route`, createExploreKeyboard(lang)); },
+    '🧭 Search Route': async () => { await sendTelegram(env, chatId, `✈️ Type route: <code>London - Paris</code>`); },
+    '🧭 Route Suchen': async () => { await sendTelegram(env, chatId, `✈️ Route: <code>Berlin - Paris</code>`); },
+    '🔥 Günün Bombası': async () => { await handleDailyDeal(env, chatId, lang, currency); },
     "🔥 Today's Deal": async () => { await handleDailyDeal(env, chatId, lang, currency); },
     '🔥 Tagesangebot': async () => { await handleDailyDeal(env, chatId, lang, currency); },
-    '📈 Fiyat Grafiği': async () => { await sendTelegram(env, chatId, `📊 Grafik için rota yaz: <code>İstanbul - Paris</code> veya komut: <code>/grafik İstanbul - Paris</code>`); },
-    '📈 Price Chart': async () => { await sendTelegram(env, chatId, `📊 Type route for chart: <code>London - Paris</code> or <code>/chart London - Paris</code>`); },
-    '📈 Preisdiagramm': async () => { await sendTelegram(env, chatId, `📊 Route für Diagramm: <code>Berlin - Paris</code>`); },
-    '🌤️ Hava + Kur': async () => { await sendTelegram(env, chatId, `🌤️ Şehir yaz (örn: <code>Paris</code>, <code>Tokyo</code>) - sana hava + kur + otel kartı göndereyim.`); },
-    '🌤️ Weather + FX': async () => { await sendTelegram(env, chatId, `🌤️ Type city (e.g. <code>Paris</code>) for weather + FX.`); },
-    '🌤️ Wetter + Währung': async () => { await sendTelegram(env, chatId, `🌤️ Stadt eingeben (z.B. <code>Paris</code>)`); },
-    '🗣️ Sesli Komut': async () => { await sendTelegram(env, chatId, `🎙️ <b>Sesli Komut</b>\n\nBana sesli mesaj gönder: <i>"Yarın İstanbul'dan Roma'ya kaç para?"</i>\nSeni otomatik metne çevirip rota araması yapacağım.\n\nTelegram → Ayarlar → Veri ve Depolama → Sesli mesajları metne çevir (açık olmalı)`); },
-    '🗣️ Voice Command': async () => { await sendTelegram(env, chatId, `🎙️ Send a voice message like: <i>"Tomorrow Istanbul to Rome price?"</i>`); },
-    '📢 Paylaş': async () => { await sendTelegram(env, chatId, `📢 <b>Viral Paylaşım</b>\n\nBir rota aradıktan sonra gelen mesajın altındaki <b>📢 Arkadaşlara Gönder</b> butonuna bas. Telegram seni kişi/grup seçimine yönlendirir, fırsat otomatik paylaşılır.\n\nHer paylaşım senin affiliate linkini içerir!`, createInlineKeyboard([[{ text: '📢 Arkadaşlara Gönder', switch_inline_query: '' }]])); },
-    '🌍 Trend Rotalar': async () => { await handleTrending(env, chatId, lang, currency); },
-    '🌍 Trending Routes': async () => { await handleTrending(env, chatId, lang, currency); },
-    '🌍 Trendrouten': async () => { await handleTrending(env, chatId, lang, currency); },
-    '💱 Para Birimi': async () => { await sendTelegram(env, chatId, `💱 Para birimi seç:`, createCurrencyKeyboard()); },
-    '💱 Currency': async () => { await sendTelegram(env, chatId, `💱 Select currency:`, createCurrencyKeyboard()); },
-    '💱 Währung': async () => { await sendTelegram(env, chatId, `💱 Währung wählen:`, createCurrencyKeyboard()); },
-    'ℹ️ Yardım': async () => { await sendTelegram(env, chatId, (t.help as any)[lang] || t.help.tr, createMainMenuKeyboard(lang)); },
-    'ℹ️ Help': async () => { await sendTelegram(env, chatId, (t.help as any)[lang] || t.help.tr, createMainMenuKeyboard(lang)); },
-    'ℹ️ Hilfe': async () => { await sendTelegram(env, chatId, (t.help as any)[lang] || t.help.tr, createMainMenuKeyboard(lang)); },
+    '🌍 Keşfet': async () => { await sendTelegram(env, chatId, lang === 'tr' ? `🌍 <b>Keşfet</b> — ne yapmak istersin?` : `🌍 Explore`, createExploreKeyboard(lang)); },
+    '🌍 Explore': async () => { await sendTelegram(env, chatId, `🌍 Explore`, createExploreKeyboard(lang)); },
+    '🌍 Entdecken': async () => { await sendTelegram(env, chatId, `🌍 Entdecken`, createExploreKeyboard(lang)); },
+    '⭐ Takip Ettiklerim': async () => { await handleFavorites(env, chatId, lang); },
+    '⭐ My Tracking': async () => { await handleFavorites(env, chatId, lang); },
+    '⭐ Meine Routen': async () => { await handleFavorites(env, chatId, lang); },
+    '⚙️ Ayarlar': async () => { await sendTelegram(env, chatId, lang === 'tr' ? `⚙️ <b>Ayarlar</b> — dil ve para birimini seç:` : `⚙️ Settings`, createLanguageKeyboard()); setTimeout(()=> sendTelegram(env, chatId, `💱`, createCurrencyKeyboard()), 400); },
+    '⚙️ Settings': async () => { await sendTelegram(env, chatId, `⚙️ Settings`, createLanguageKeyboard()); },
+    '⚙️ Einstellungen': async () => { await sendTelegram(env, chatId, `⚙️ Einstellungen`, createLanguageKeyboard()); },
+    'ℹ️ Yardım': async () => { await sendTelegram(env, chatId, UI.helpCaption(lang), createMainMenuKeyboard(lang)); },
+    'ℹ️ Help': async () => { await sendTelegram(env, chatId, UI.helpCaption(lang), createMainMenuKeyboard(lang)); },
+    'ℹ️ Hilfe': async () => { await sendTelegram(env, chatId, UI.helpCaption(lang), createMainMenuKeyboard(lang)); },
   };
   const fn = (map as any)[text];
   if (fn) { fn(); return true; }
@@ -250,10 +247,11 @@ function handleMenuButtons(text: string, env: Env, chatId: number, lang: string,
 
 async function handleRouteSearch(env: Env, chatId: number, from: string, to: string, lang: string, currency: string): Promise<void> {
   try {
+    await sendChatAction(env, chatId, 'upload_photo');
     const fromCode = getCityCode(from);
     const toCode = getCityCode(to);
     if (fromCode === 'ANY' || toCode === 'ANY') {
-      await sendTelegram(env, chatId, lang === 'tr' ? `⚠️ Şehir kodları bulunamadı. Lütfen şehir isimlerini doğru yaz (örn: <code>İstanbul - Paris</code>, <code>New York - Tokyo</code>)` : `⚠️ City code not found. Try <code>London - Paris</code>`);
+      await sendTelegram(env, chatId, lang === 'tr' ? `⚠️ Şehirleri tam anlayamadım. Lütfen kibarca şöyle yaz: <code>İstanbul - Paris</code> veya <code>New York - Tokyo</code>` : `⚠️ City not found. Try <code>London - Paris</code>`);
       return;
     }
     const [flightLink, hotelLink, carLink, activityLink, photoUrl, rate] = await Promise.all([
@@ -265,26 +263,25 @@ async function handleRouteSearch(env: Env, chatId: number, from: string, to: str
       getExchangeRate('EUR', currency === 'TRY' ? 'TRY' : currency),
     ]);
 
-    // Fiyat geçmişine kaydet (fire-and-forget, rastgele demo fiyat)
     const demoPrice = Math.floor(1500 + Math.random() * 3000);
     await DB.savePriceHistory(env, `${from} - ${to}`, demoPrice, currency).catch(() => {});
 
-    const rateText = rate ? `\n💱 1 EUR ≈ ${rate.toFixed(2)} ${currency}` : '';
-    const caption = `✈️ <b>${from} → ${to}</b> için fırsatlar hazır!${rateText}\n\n👇 Butonlardan inceleyebilir, <code>/takip ${from} - ${to} - 1500 ${currency}</code> ile alarm kurabilirsin.`;
+    const rateText = rate ? `💱 1 EUR ≈ ${rate.toFixed(2)} ${currency}` : undefined;
+    const caption = UI.routeCaption(from, to, currency, rateText);
     const keyboard = createTravelKeyboard(flightLink, hotelLink, carLink, activityLink);
     const res = await sendPhoto(env, chatId, photoUrl, caption, keyboard);
-    // Foto gönderilemezse metin düş
     if (!res?.ok) {
       await sendTelegram(env, chatId, `✈️ <b>${from} → ${to}</b>\n\n✈️ Uçuş: ${flightLink}\n🏨 Otel: ${hotelLink}\n🚗 Araç: ${carLink}\n🎯 Aktivite: ${activityLink}`, keyboard);
     }
   } catch (e) {
     console.error('routeSearch', e);
-    await sendTelegram(env, chatId, `⚠️ Arama sırasında hata oluştu. Lütfen tekrar dene.`);
+    await sendTelegram(env, chatId, `⚠️ Kibar hatırlatma: Arama sırasında küçük bir aksaklık oldu. Lütfen bir kez daha deneyin.`);
   }
 }
 
 async function handleWeatherCard(env: Env, chatId: number, city: string, lang: string, currency: string): Promise<void> {
   try {
+    await sendChatAction(env, chatId, 'upload_photo');
     const coords = getCityCoords(city);
     const [weather, hotelLink, rate, photoUrl] = await Promise.all([
       getWeather(city),
@@ -294,18 +291,18 @@ async function handleWeatherCard(env: Env, chatId: number, city: string, lang: s
     ]);
     if (!weather) {
       const hotelOnly = await getHotelLink(env, city, currency);
-      await sendTelegram(env, chatId, lang === 'tr' ? `🏨 <b>${city}</b> için otel fırsatları: ${hotelOnly}` : `🏨 Hotels in <b>${city}</b>: ${hotelOnly}`);
+      await sendTelegram(env, chatId, lang === 'tr' ? `🏨 <b>${city}</b> için otel fırsatlarını hazırladım: ${hotelOnly}` : `🏨 Hotels in <b>${city}</b>: ${hotelOnly}`);
       return;
     }
     const weatherText = formatWeather(weather, coords?.name || city, lang);
     const rateText = rate ? `\n💱 1 EUR = ${rate.toFixed(2)} ${currency}` : '';
-    const caption = `${weatherText}${rateText}\n\n🏨 Oteller için butona tıkla:`;
+    const caption = `${weatherText}${rateText}\n\n${UI.weatherCaption(city)}`;
     const kb = createSingleButtonKeyboard(lang === 'tr' ? '🏨 Otelleri Gör' : '🏨 Hotels', hotelLink);
     const res = await sendPhoto(env, chatId, photoUrl, caption, kb);
     if (!res?.ok) await sendTelegram(env, chatId, `${weatherText}${rateText}\n\n🏨 ${hotelLink}`, kb);
   } catch (e) {
     console.error('weatherCard', e);
-    await sendTelegram(env, chatId, `⚠️ Hava durumu alınamadı.`);
+    await sendTelegram(env, chatId, `⚠️ Hava durumu şu an alınamadı, lütfen biraz sonra tekrar deneyin.`);
   }
 }
 
@@ -344,9 +341,9 @@ async function handleDailyDeal(env: Env, chatId: number, lang: string, currency:
 }
 
 async function handlePriceChart(env: Env, chatId: number, route: string, lang: string, currency: string): Promise<void> {
+  await sendChatAction(env, chatId, 'upload_photo');
   let history = await DB.getPriceHistory(env, route, 30);
-  // Demo veri yoksa üret
-  if (!history || history.length < 3) {
+  if (!history || (history as any[]).length < 3) {
     const now = Date.now();
     const demoPrices: number[] = [];
     const demoLabels: string[] = [];
@@ -358,14 +355,14 @@ async function handlePriceChart(env: Env, chatId: number, route: string, lang: s
     }
     const url = await getPriceChartUrl(route, demoPrices, demoLabels);
     const min = Math.min(...demoPrices);
-    await sendPhoto(env, chatId, url, `📈 <b>${route}</b> — Son 30 gün\n📉 En düşük: <b>${min} ${currency}</b>`, createSingleButtonKeyboard(lang === 'tr' ? '📉 En düşük fiyatı al' : '📉 Buy cheapest', await searchFlights(env, route.split('-')[0].trim(), route.split('-')[1].trim(), currency)));
+    await sendPhoto(env, chatId, url, UI.chartCaption(route, min, currency, lang), createSingleButtonKeyboard(lang === 'tr' ? '📉 En düşük fiyatı al' : '📉 Buy cheapest', await searchFlights(env, route.split('-')[0].trim(), route.split('-')[1].trim(), currency)));
     return;
   }
   const prices = (history as any[]).map((r: any) => r.price);
   const labels = (history as any[]).map((r: any) => new Date(r.checked_at).toLocaleDateString(lang === 'tr' ? 'tr-TR' : 'en-US', { day: '2-digit', month: 'short' }));
   const url = await getPriceChartUrl(route, prices, labels);
   const min = Math.min(...prices);
-  await sendPhoto(env, chatId, url, `📈 <b>${route}</b> — Son 30 gün\n📉 En düşük: <b>${min} ${currency}</b>`, createSingleButtonKeyboard(lang === 'tr' ? '📉 En düşük fiyatı al' : '📉 Buy cheapest', await searchFlights(env, route.split('-')[0].trim(), route.split('-')[1].trim(), currency)));
+  await sendPhoto(env, chatId, url, UI.chartCaption(route, min, currency, lang), createSingleButtonKeyboard(lang === 'tr' ? '📉 En düşük fiyatı al' : '📉 Buy cheapest', await searchFlights(env, route.split('-')[0].trim(), route.split('-')[1].trim(), currency)));
 }
 
 async function handleFavorites(env: Env, chatId: number, lang: string): Promise<void> {
@@ -455,6 +452,19 @@ export async function handleCallbackQuery(callbackQuery: any, env: Env): Promise
       const u = await DB.getUser(env, chatId);
       await answerCallbackQuery(env, cqId, `📊 Grafik hazırlanıyor`);
       await handlePriceChart(env, chatId, route, getLang(u), u?.currency || 'TRY');
+      return;
+    }
+    if (data.startsWith('explore_')) {
+      const kind = data.replace('explore_', '');
+      const u = await DB.getUser(env, chatId);
+      const l = getLang(u); const cur = u?.currency || 'TRY';
+      await answerCallbackQuery(env, cqId);
+      if (kind === 'chart') await sendTelegram(env, chatId, `📈 Grafik için rota yaz: <code>İstanbul - Paris</code>`);
+      else if (kind === 'weather') await sendTelegram(env, chatId, `🌤️ Şehir yaz: <code>Paris</code>, <code>Tokyo</code>`);
+      else if (kind === 'voice') await sendTelegram(env, chatId, `🎙️ Sesli mesaj gönder: "Yarın İstanbul'dan Roma'ya kaç para?"`);
+      else if (kind === 'share') await sendTelegram(env, chatId, `📢 Bir rota aradıktan sonra gelen 📢 butonuna basarak paylaşabilirsin.`, createInlineKeyboard([[{ text: '📢 Arkadaşlara Gönder', switch_inline_query: '' }]]));
+      else if (kind === 'currency') { await sendTelegram(env, chatId, `💱 Para birimi seç:`, createCurrencyKeyboard()); }
+      else if (kind === 'trending') await handleTrending(env, chatId, l, cur);
       return;
     }
     await answerCallbackQuery(env, cqId);

@@ -137,6 +137,16 @@ export function getFileLink(env: Env, filePath: string): string {
   return `https://api.telegram.org/file/bot${env.TELEGRAM_BOT_TOKEN}/${filePath}`;
 }
 
+export async function sendChatAction(env: Env, chatId: number | string, action: string = "typing"): Promise<void> {
+  try {
+    await fetch(getBotUrl(env, "sendChatAction"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: chatId, action }),
+    });
+  } catch {}
+}
+
 export async function sendToChannel(env: Env, text: string, replyMarkup?: ReplyMarkup): Promise<any> {
   return sendTelegram(env, CHANNEL_ID, text, replyMarkup);
 }
@@ -259,33 +269,44 @@ export function createSingleButtonKeyboard(text: string, url: string): ReplyMark
 }
 
 export function createMainMenuKeyboard(lang: string = 'tr'): ReplyMarkup {
+  // Sade kibar menü: 6 buton, 3 satır
   const menus: Record<string, ReplyKeyboardButton[][]> = {
     tr: [
-      [{ text: '🧭 Rota Ara' }, { text: '🔥 Günün Fırsatı' }],
-      [{ text: '📈 Fiyat Grafiği' }, { text: '🌤️ Hava + Kur' }],
-      [{ text: '🗣️ Sesli Komut' }, { text: '📢 Paylaş' }],
-      [{ text: '🌍 Trend Rotalar' }, { text: '💱 Para Birimi' }],
-      [{ text: '⭐ Favori Rotalarım' }, { text: '🔔 Alarmlarım' }],
+      [{ text: '🧭 Rota Ara' }, { text: '🔥 Günün Bombası' }],
+      [{ text: '🌍 Keşfet' }, { text: '⭐ Takip Ettiklerim' }],
       [{ text: '⚙️ Ayarlar' }, { text: 'ℹ️ Yardım' }],
     ],
     en: [
       [{ text: '🧭 Search Route' }, { text: '🔥 Today\'s Deal' }],
-      [{ text: '📈 Price Chart' }, { text: '🌤️ Weather + FX' }],
-      [{ text: '🗣️ Voice Command' }, { text: '📢 Share' }],
-      [{ text: '🌍 Trending Routes' }, { text: '💱 Currency' }],
-      [{ text: '⭐ My Favorites' }, { text: '🔔 My Alerts' }],
+      [{ text: '🌍 Explore' }, { text: '⭐ My Tracking' }],
       [{ text: '⚙️ Settings' }, { text: 'ℹ️ Help' }],
     ],
     de: [
       [{ text: '🧭 Route Suchen' }, { text: '🔥 Tagesangebot' }],
-      [{ text: '📈 Preisdiagramm' }, { text: '🌤️ Wetter + Währung' }],
-      [{ text: '🗣️ Sprachbefehl' }, { text: '📢 Teilen' }],
-      [{ text: '🌍 Trendrouten' }, { text: '💱 Währung' }],
-      [{ text: '⭐ Meine Favoriten' }, { text: '🔔 Meine Alarme' }],
+      [{ text: '🌍 Entdecken' }, { text: '⭐ Meine Routen' }],
       [{ text: '⚙️ Einstellungen' }, { text: 'ℹ️ Hilfe' }],
     ],
   };
   return createReplyKeyboard(menus[lang] || menus.tr);
+}
+
+export function createExploreKeyboard(lang: string = 'tr'): ReplyMarkup {
+  // Keşfet alt menüsü - inline olarak gösterilir
+  const rows: Record<string, InlineKeyboardButton[][]> = {
+    tr: [
+      [{ text: '📈 Fiyat Grafiği', callback_data: 'explore_chart' }, { text: '🌤️ Hava + Kur', callback_data: 'explore_weather' }],
+      [{ text: '🗣️ Sesli Komut', callback_data: 'explore_voice' }, { text: '📢 Paylaş', callback_data: 'explore_share' }],
+      [{ text: '💱 Para Birimi', callback_data: 'explore_currency' }, { text: '🌍 Trendler', callback_data: 'explore_trending' }],
+    ],
+    en: [
+      [{ text: '📈 Chart', callback_data: 'explore_chart' }, { text: '🌤️ Weather', callback_data: 'explore_weather' }],
+      [{ text: '🗣️ Voice', callback_data: 'explore_voice' }, { text: '💱 Currency', callback_data: 'explore_currency' }],
+    ],
+    de: [
+      [{ text: '📈 Diagramm', callback_data: 'explore_chart' }, { text: '🌤️ Wetter', callback_data: 'explore_weather' }],
+    ],
+  };
+  return createInlineKeyboard(rows[lang] || rows.tr);
 }
 
 export function createLanguageKeyboard(): ReplyMarkup {

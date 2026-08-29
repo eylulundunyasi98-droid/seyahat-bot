@@ -234,6 +234,42 @@ export async function getTranslation(key: string, lang: string, env: Env): Promi
   return result?.value || null;
 }
 
+// Kısa link + tıklama takibi (şeffaf link)
+export async function createShortLink(env: Env, url: string, route?: string, userId?: number): Promise<string> {
+  const id = Math.random().toString(36).substring(2, 8) + Math.random().toString(36).substring(2, 4);
+  try {
+    await env.DB.prepare('INSERT INTO clicks (id, url, route, user_id) VALUES (?, ?, ?, ?)')
+      .bind(id, url, route || null, userId || null).run();
+  } catch {}
+  // Worker domain'i dinamik değil, sabit kullanıyoruz
+  return `https://seyahat-bot.eylulundunyasi98.workers.dev/r/${id}`;
+}
+
+export async function resolveShortLink(env: Env, id: string): Promise<string | null> {
+  const row: any = await env.DB.prepare('SELECT url FROM clicks WHERE id = ?').bind(id).first();
+  if (!row) return null;
+  await env.DB.prepare('UPDATE clicks SET hits = hits + 1, last_hit_at = CURRENT_TIMESTAMP WHERE id = ?').bind(id).run().catch(()=>{});
+  return row.url;
+}
+
+export async function checkRateLimit(env: Env, userId: number, limit: number = 20, windowSec: number = 60): Promise<boolean> {
+  // Basit rate limit: 20 istek/dk
+  const row: any = await env.DB.prepare('SELECT count, window_start FROM rate_limits WHERE user_id = ?').bind(userId).first();
+  const now = Date.now();
+  if (!row) {
+    await env.DB.prepare('INSERT INTO rate_limits (user_id, count, window_start) VALUES (?, 1, CURRENT_TIMESTAMP)').bind(userId).run();
+    return true;
+  }
+  const windowStart = new Date(row.window_start).getTime();
+  if (now - windowStart > windowSec * 1000) {
+    await env.DB.prepare('UPDATE rate_limits SET count = 1, window_start = CURRENT_TIMESTAMP WHERE user_id = ?').bind(userId).run();
+    return true;
+  }
+  if (row.count >= limit) return false;
+  await env.DB.prepare('UPDATE rate_limits SET count = count + 1 WHERE user_id = ?').bind(userId).run();
+  return true;
+}
+
 export async function setTranslation(key: string, lang: string, value: string, env: Env): Promise<void> {
   await env.DB.prepare(`
     INSERT OR REPLACE INTO translations_cache (key, language, value)

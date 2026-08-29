@@ -162,10 +162,18 @@ async function createAffiliateLink(env: Env, url: string): Promise<string> {
       }),
     });
     const data = await res.json() as any;
-    return data.link ?? url;
+    const affiliate = data.link ?? url;
+    // Şeffaf kısa linke çevir (tıklama takibi)
+    try {
+      const { createShortLink } = await import('./db');
+      return await createShortLink(env, affiliate, url);
+    } catch { return affiliate; }
   } catch (e) {
     console.error('Affiliate link creation failed:', e);
-    return url;
+    try {
+      const { createShortLink } = await import('./db');
+      return await createShortLink(env, url);
+    } catch { return url; }
   }
 }
 
