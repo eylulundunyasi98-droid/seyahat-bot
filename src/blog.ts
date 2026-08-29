@@ -113,12 +113,14 @@ function baseHead(title: string, desc: string): string {
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">`;
 }
 
+const tgIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="#0ea5e9" style="vertical-align:-3px;margin-right:4px"><path d="M12 2a10 10 0 1010 10A10 10 0 0012 2zm3.6 7.2l-1.4 6.6a1 1 0 01-.8.7l-2.3.2-1.3-1.2 2.1-2-.1-.1-3 1.9-.9-.9 6-3.8a.5.5 0 01.7.4z"/></svg>`;
+
 function header(): string {
-  return `<header class="nav"><div class="wrap navin"><a class="logo" href="/">✈️ Seyahat<span>Fırsat</span></a><nav><a href="/blog">Blog</a><a href="#ara">Ara</a><a href="/sitemap.xml">Sitemap</a><a class="cta" href="https://t.me/avcisi_firsat_bot" target="_blank">Telegram'da Aç →</a></nav></div></header>`;
+  return `<header class="nav"><div class="wrap navin"><a class="logo" href="/">✈️ Seyahat<span>Fırsat</span></a><nav><a href="/blog">Blog</a><a href="#ara">Ara</a><a href="/sitemap.xml">Sitemap</a><a class="cta" href="https://t.me/avcisi_firsat_bot" target="_blank">${tgIcon}Telegram'da Aç</a></nav></div></header>`;
 }
 
 function footer(): string {
-  return `<footer class="foot"><div class="wrap"><div>© 2026 Seyahat Fırsat Botu — Dürüst rehberler. <a href="https://t.me/avcisi_firsat_bot">@avcisi_firsat_bot</a> • Kanal: -1004391209534</div><div><a href="/blog">Blog</a> • <a href="/sitemap.xml">Sitemap</a> • <a href="/robots.txt">Robots</a></div></div></footer>`;
+  return `<footer class="foot"><div class="wrap" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px"><div>© 2026 Seyahat Fırsat Botu — Dürüst rehberler. <a href="https://t.me/avcisi_firsat_bot" style="font-weight:700">${tgIcon}@avcisi_firsat_bot</a> <a href="https://t.me/avcisi_firsat_bot" style="background:#0ea5e9;color:#fff;padding:4px 10px;border-radius:999px;font-size:13px;margin-left:6px">${tgIcon}Kanala Katıl</a></div><div><a href="/blog">Blog</a> • <a href="/sitemap.xml">Sitemap</a> • <a href="/robots.txt">Robots</a></div></div></footer>`;
 }
 
 const style = `<style>
@@ -238,12 +240,16 @@ ${header()}
 <section class="wrap" style="padding:8px 20px">
   <h2>Son rehberler — yatay kaydır →</h2>
   <div class="hscroll">${cards}</div>
-  <p><a href="/blog">Tüm rehberler →</a></p>
+  <p><a class="btn out" href="/blog">Tüm rehberleri Gör →</a></p>
 </section>
 
 <section class="wrap" style="padding:0 20px 28px">
-  <div class="card pad" style="background:linear-gradient(135deg,#ecfeff,#f0f9ff);border:1px dashed #7dd3fc">
-    <strong>Travelpayouts onayı için:</strong> Bu site özgün blog + aktif bot. Proje ID 568076 • <a href="https://t.me/avcisi_firsat_bot">@avcisi_firsat_bot</a> • Kanal -1004391209534 • Sitemap ve robots hazır.
+  <div class="card pad" style="background:linear-gradient(135deg,#ecfeff,#f0f9ff);border:1px dashed #7dd3fc;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <span>✅ <strong>Travelpayouts için:</strong> Özgün blog + aktif bot</span>
+    <span style="background:#fff;border:1px solid #bae6fd;padding:4px 8px;border-radius:999px;font-size:13px">📁 Proje 568076</span>
+    <a href="https://t.me/avcisi_firsat_bot" style="background:#fff;border:1px solid #bae6fd;padding:4px 10px;border-radius:999px;font-size:13px">${tgIcon}@avcisi_firsat_bot</a>
+    <a href="https://t.me/avcisi_firsat_bot" style="background:var(--ink);color:#fff;padding:6px 12px;border-radius:999px;font-size:13px">${tgIcon}Telegram Kanalı</a>
+    <span class="meta">Sitemap & robots hazır</span>
   </div>
 </section>
 ${footer()}
