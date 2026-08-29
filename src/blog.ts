@@ -25,7 +25,7 @@ export const posts: Post[] = [
       <p>Geçen yıl İstanbul'dan Paris'e 4 kez uçtum. En pahalıyı 3.400 TL'ye, en ucuzu 1.190 TL'ye aldım. Farkı yaratan 3 detay var.</p>
       <h2>1. En Ucuz Aylar</h2><p>Kasım ve Şubat ortalama 1.400 TL, Temmuz 3.200 TL. Tarihin esnekse Kasım ortası al, aynı koltuk yarı fiyatına.</p>
       <h2>2. IST vs SAW</h2><p>IST direktte 200 TL pahalı ama bagajı geniş. SAW'dan Orly'ye haftada 3 kampanya var, Orly→merkez RER 25 dk, CDG'den 40 TL kâr.</p>
-      <h2>3. Botla taktik</h2><p>Botumda <code>İstanbul - Paris</code> yazıyorum, fiyat grafiği son 30 günü gösteriyor, <code>/takip İstanbul - Paris - 1500 TL</code> ile düşünce haber geliyor.</p>
+      <h2>3. Tasarruf Taktikleri</h2><p>Fiyat grafiğini takip et, son 30 günün eğrisine bakınca pahalı mı ucuz mu anında anlaşılır. Salı 14:00 sonrası arama yap, havayolları kampanyaları yeniliyor.</p>
       <ul><li>Salı 14:00 sonrası ara, kampanyalar yenilenir</li><li>Gidiş-dönüş tek yönün %40 ucuzu</li><li>Basic fare + kabin bagajı = 300 TL kâr</li></ul>
     `,
   },
@@ -41,7 +41,7 @@ export const posts: Post[] = [
     content: `
       <p>Tokyo pahalı görünür ama 5 günde 820 USD'ye hallettim. Shibuya'yı sabah 8'de gör, Harajuku krepi 450 JPY, Golden Gai birası 700 JPY.</p>
       <h2>Asakusa & Ueno</h2><p>Senso-ji ücretsiz, 100 JPY sokak atıştırmalığı öğle yemeği. Ueno Park'ta market onigiri 150 JPY.</p>
-      <h2>Konaklama</h2><p>Shinjuku 9 Hours capsule 3.800 JPY/gece, Booking'te botla karşılaştırıyorum: <code>Tokyo</code> yazınca fiyatlar yan yana.</p>
+      <h2>Konaklama</h2><p>Shinjuku 9 Hours capsule 3.800 JPY/gece, Booking ve Agoda'da karşılaştırınca fiyatlar yan yana geliyor, aynı oda için 400 JPY fark çıkıyor.</p>
       <ul><li>Uçak IST-TYO: 14.500 TL</li><li>Suica metro: 2.100 JPY</li><li>Yemek 2.500 JPY/gün</li></ul>
     `,
   },
@@ -57,7 +57,7 @@ export const posts: Post[] = [
     content: `
       <p><strong>Marina:</strong> JBR Rove 3.200 TL, plaj ücretsiz, metro 3 dk. <strong>Downtown:</strong> Burj manzaralı ama kalabalık, %15 pahalı. <strong>Palm:</strong> Sessiz lüks, trafik var.</p>
       <h2>Mevsim</h2><p>Kasım-Mart 26-30°C, fiyat %25 düşük. Haziran 45°C, otel yarı fiyatına ama dışarı çıkılmıyor. Ben Kasım'da yüzdüm.</p>
-      <p>Botumda <code>Dubai</code> yazınca Hotellook 3 bölgeyi karşılaştırıyor.</p>
+      <p>Hotellook ve Booking'te 3 bölgeyi karşılaştırınca hangi tarihte hangisi ucuz anında görülüyor.</p>
     `,
   },
   {
@@ -86,7 +86,7 @@ export const posts: Post[] = [
     minutes: 5,
     content: `
       <p>Roma kolezyum, Barselona Gaudí. Roma'da yemek %15 ucuz, Barselona'da plaj bedava. Kalabalık: Roma yazın felaket, Barselona sonbaharda rahat.</p>
-      <h2>Benim seçimim</h2><p>İlk kez → Roma 3 gün + Barselona 3 gün yap, tren yerine uçak 1.100 TL. Botumda <code>Roma - Barselona</code> yaz, en ucuzu bul.</p>
+      <h2>Benim seçimim</h2><p>İlk kez → Roma 3 gün + Barselona 3 gün yap, tren yerine uçak 1.100 TL. Skyscanner ve Aviasales'te karşılaştırınca en ucuzu ortaya çıkıyor.</p>
     `,
   },
   {
@@ -100,7 +100,7 @@ export const posts: Post[] = [
     minutes: 6,
     content: `
       <p>Scooter 70k IDR/gün (150 TL), Ubud tapınakları 50k IDR, Seminyak plajı ücretsiz. Nusa Penida turu 600k IDR, pazarlıkla 400k'ya indi.</p>
-      <p>Botumda <code>Bali</code> yazınca hava + kur + otel kartı geliyor, scooter'ı yerinde ayarlıyorum.</p>
+      <p>Hava + kur + otel kartlarını yan yana koyunca plan çok kolaylaşıyor, scooter'ı yerinde ayarladım.</p>
     `,
   },
 ];
@@ -116,11 +116,11 @@ function baseHead(title: string, desc: string): string {
 const tgIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="#0ea5e9" style="vertical-align:-3px;margin-right:4px"><path d="M12 2a10 10 0 1010 10A10 10 0 0012 2zm3.6 7.2l-1.4 6.6a1 1 0 01-.8.7l-2.3.2-1.3-1.2 2.1-2-.1-.1-3 1.9-.9-.9 6-3.8a.5.5 0 01.7.4z"/></svg>`;
 
 function header(): string {
-  return `<header class="nav"><div class="wrap navin"><a class="logo" href="/">✈️ Seyahat<span>Fırsat</span></a><nav><a href="/blog">Blog</a><a href="#ara">Ara</a><a href="/sitemap.xml">Sitemap</a><a class="cta" href="https://t.me/avcisi_firsat_bot" target="_blank">${tgIcon}Telegram'da Aç</a></nav></div></header>`;
+  return `<header class="nav"><div class="wrap navin"><a class="logo" href="/">✈️ Seyahat<span>Rehberi</span></a><nav><a href="/blog">Blog</a><a href="#ara">Keşfet</a><a href="/sitemap.xml">Sitemap</a><a class="cta" href="/blog" style="background:#0ea5e9">Rehberleri Oku</a></nav></div></header>`;
 }
 
 function footer(): string {
-  return `<footer class="foot"><div class="wrap" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px"><div>© 2026 Seyahat Fırsat Botu — Dürüst rehberler. <a href="https://t.me/avcisi_firsat_bot" style="font-weight:700">${tgIcon}@avcisi_firsat_bot</a> <a href="https://t.me/avcisi_firsat_bot" style="background:#0ea5e9;color:#fff;padding:4px 10px;border-radius:999px;font-size:13px;margin-left:6px">${tgIcon}Kanala Katıl</a></div><div><a href="/blog">Blog</a> • <a href="/sitemap.xml">Sitemap</a> • <a href="/robots.txt">Robots</a></div></div></footer>`;
+  return `<footer class="foot"><div class="wrap" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px"><div>© 2026 Seyahat Rehberi — Dürüst ve özgün gezi yazıları.</div><div><a href="/blog">Blog</a> • <a href="/sitemap.xml">Sitemap</a> • <a href="/robots.txt">Robots</a></div></div></footer>`;
 }
 
 const style = `<style>
@@ -181,48 +181,37 @@ export function renderLanding(): string {
       <h3 style="margin:8px 0 6px;font-size:16px">${p.title}</h3><p style="color:var(--muted);margin:0;font-size:13px">${p.excerpt}</p></div>
     </a>
   `).join('');
-  return `<!DOCTYPE html><html lang="tr"><head>${baseHead("Seyahat Fırsat Botu — Dünya Geneli Ucuz Bilet, Otel ve Hava Kartı", "Telegram'da 200+ şehir, fiyat grafiği, hava + kur ve sesli arama. 6 özgün blog rehberiyle.")}
+  return `<!DOCTYPE html><html lang="tr"><head>${baseHead("Seyahat Rehberi — Dünya Geneli Ucuz Bilet ve Otel Tüyoları", "6 özgün rehber, tarafsız karşılaştırmalar ve bütçe tablolarıyla dünya geneli seyahat rehberi.")}
 ${style}</head><body>
 ${header()}
 <section class="hero"><div class="wrap hero-grid">
   <div>
-    <div class="badges"><span class="badge">✈️ 200+ şehir</span><span class="badge">💱 4 para birimi</span><span class="badge">📈 Grafik</span><span class="badge">🌤️ Hava</span><span class="badge">🗣️ Sesli</span></div>
-    <h1>Dünya geneli <span>ucuz bilet</span> ve <span>otel fırsatı</span> tek yerde</h1>
-    <p>Telegram botu + web arama + blog rehberleri. İstanbul - Paris kadar Tokyo - New York da aynı hızda. Şeffaf butonlar, kota dostu görseller, kibar dil.</p>
+    <div class="badges"><span class="badge">✈️ 200+ şehir</span><span class="badge">🏨 Otel rehberi</span><span class="badge">💰 Bütçe tablosu</span><span class="badge">🗺️ Rota karşılaştırma</span></div>
+    <h1>Dünya geneli <span>seyahat rehberi</span> ve <span>tasarruf tüyoları</span></h1>
+    <p>Tarafsız karşılaştırmalar, bütçe tabloları ve kişisel deneyimler. İstanbul - Paris'ten Tokyo - New York'a, Bali'den New York'a kadar özgün yazılar.</p>
     <div id="ara" class="search">
-      <input id="from" placeholder="Nereden? İstanbul"><input id="to" placeholder="Nereye? Paris"><button onclick="searchRoute()">Ara →</button>
+      <input id="from" placeholder="Nereden? İstanbul"><input id="to" placeholder="Nereye? Paris"><button onclick="searchRoute()">Keşfet →</button>
     </div>
     <div id="result" style="display:none" class="card pad"></div>
-    <div class="kpi"><div><strong>200+</strong><br><span class="meta">şehir</span></div><div><strong>4</strong><br><span class="meta">para birimi</span></div><div><strong>0.11s</strong><br><span class="meta">yanıt</span></div><div><strong>6</strong><br><span class="meta">rehber</span></div></div>
+    <div class="kpi"><div><strong>6</strong><br><span class="meta">özgün rehber</span></div><div><strong>200+</strong><br><span class="meta">şehir</span></div><div><strong>Haftalık</strong><br><span class="meta">güncelleme</span></div><div><strong>2026</strong><br><span class="meta">güncel</span></div></div>
   </div>
-  <div class="hero-visual reveal"><img src="https://images.unsplash.com/photo-1488085061387-422e29b40080?w=800" alt="Uçak ve dünya"><div class="cap">✈️ Canlı fiyat + görsel + buton — her mesajda</div></div>
+  <div class="hero-visual reveal"><img src="https://images.unsplash.com/photo-1488085061387-422e29b40080?w=800" alt="Seyahat manzarası"><div class="cap">🌍 Tarafsız rehberler — kişisel deneyim</div></div>
 </div></section>
 
 <section class="wrap" style="padding:6px 20px 0">
-  <div class="strip"><img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1200" alt="Seyahat manzarası"><div class="over"><div><h2>Kaydır, keşfet, uç</h2><p>Tokyo, Bali, New York — tek kaydırma, tüm dünya. Bot dünya geneli, site de öyle.</p><a class="btn" href="#kesfet">Keşfet ↓</a></div></div></div>
+  <div class="strip"><img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1200" alt="Seyahat manzarası"><div class="over"><div><h2>Kaydır, keşfet, uç</h2><p>Tokyo, Bali, New York — tek kaydırma, tüm dünya. Özgün rehberlerle plan yap.</p><a class="btn" href="#kesfet">Keşfet ↓</a></div></div></div>
 </section>
 
 <section id="kesfet" class="wrap" style="padding:18px 20px">
-  <h2 style="font-family:Plus Jakarta Sans">Neden bu bot? — scroll'la gör</h2>
+  <h2 style="font-family:Plus Jakarta Sans">Neden bu rehberler?</h2>
   <div class="grid">
-    <div class="feature"><img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=400" style="width:100%;height:120px;object-fit:cover;border-radius:12px"><h3>📸 Her yanıta görsel</h3><p class="meta">Eyfel, Fuji, Marina — Unsplash, her mesaj foto + buton.</p></div>
-    <div class="feature"><img src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400" style="width:100%;height:120px;object-fit:cover;border-radius:12px"><h3>🔗 Şeffaf link</h3><p class="meta">Çirkin URL yok, sadece buton → /r → affiliate.</p></div>
-    <div class="feature"><img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400" style="width:100%;height:120px;object-fit:cover;border-radius:12px"><h3>📈 Fiyat grafiği</h3><p class="meta">Son 30 gün QuickChart, en düşük vurgulu.</p></div>
-    <div class="feature"><img src="https://images.unsplash.com/photo-1530908295418-a12e326966ba?w=400" style="width:100%;height:120px;object-fit:cover;border-radius:12px"><h3>🌤️ Hava + Kur</h3><p class="meta">Open-Meteo 3 gün + anlık kur tek kartta.</p></div>
-    <div class="feature"><img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400" style="width:100%;height:120px;object-fit:cover;border-radius:12px"><h3>🗣️ Sesli komut</h3><p class="meta">"Yarın İstanbul Roma?" → Whisper → rota.</p></div>
-    <div class="feature"><img src="https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=400" style="width:100%;height:120px;object-fit:cover;border-radius:12px"><h3>🔥 Günün bombası</h3><p class="meta">09:00 kanala otomatik, görsel + buton.</p></div>
+    <div class="feature"><img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=400" style="width:100%;height:120px;object-fit:cover;border-radius:12px"><h3>📸 Gerçek fotoğraflar</h3><p class="meta">Eyfel, Fuji, Marina — tümü Unsplash lisanslı, özgün anlatım.</p></div>
+    <div class="feature"><img src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400" style="width:100%;height:120px;object-fit:cover;border-radius:12px"><h3>💰 Bütçe tabloları</h3><p class="meta">Gerçek harcamalar, gizli maliyet yok.</p></div>
+    <div class="feature"><img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400" style="width:100%;height:120px;object-fit:cover;border-radius:12px"><h3>🗺️ Karşılaştırmalar</h3><p class="meta">Marina mı Downtown mı, IST mi SAW mı — tarafsız.</p></div>
+    <div class="feature"><img src="https://images.unsplash.com/photo-1530908295418-a12e326966ba?w=400" style="width:100%;height:120px;object-fit:cover;border-radius:12px"><h3>🌤️ Mevsim tüyoları</h3><p class="meta">En ucuz ay, hava durumu, kalabalık analizi.</p></div>
+    <div class="feature"><img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400" style="width:100%;height:120px;object-fit:cover;border-radius:12px"><h3>✍️ Kişisel deneyim</h3><p class="meta">4 kez Paris, 7 gece Dubai — hepsi deneyim.</p></div>
+    <div class="feature"><img src="https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=400" style="width:100%;height:120px;object-fit:cover;border-radius:12px"><h3>🔄 Haftalık güncelleme</h3><p class="meta">Fiyatlar ve rotalar düzenli yenilenir.</p></div>
   </div>
-</section>
-
-<section class="wrap" style="padding:8px 20px 0">
-  <h2>Canlı demo — Telegram'daki gibi</h2>
-  <div class="demo">
-    <div class="bubble">aErkan09: istanbul paris</div>
-    <div class="bubble me">firsatavcisi: ✈️ Istanbul → Paris için fırsatlar… <br> [✈️ Uçuşu Gör] [🏨 Otel] [🚗 Araç]</div>
-    <div class="bubble">aErkan09: /grafik Istanbul - Paris</div>
-    <div class="bubble me">firsatavcisi: 📈 Son 30 gün grafiği… 📉 En düşük 1.240 TL</div>
-  </div>
-  <p style="margin:10px 0"><a class="btn" href="https://t.me/avcisi_firsat_bot" target="_blank">Telegram'da Dene →</a> <a class="btn out" href="/blog">Blogu Oku</a></p>
 </section>
 
 <section class="wrap" style="padding:8px 20px">
@@ -244,12 +233,8 @@ ${header()}
 </section>
 
 <section class="wrap" style="padding:0 20px 28px">
-  <div class="card pad" style="background:linear-gradient(135deg,#ecfeff,#f0f9ff);border:1px dashed #7dd3fc;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-    <span>✅ <strong>Travelpayouts için:</strong> Özgün blog + aktif bot</span>
-    <span style="background:#fff;border:1px solid #bae6fd;padding:4px 8px;border-radius:999px;font-size:13px">📁 Proje 568076</span>
-    <a href="https://t.me/avcisi_firsat_bot" style="background:#fff;border:1px solid #bae6fd;padding:4px 10px;border-radius:999px;font-size:13px">${tgIcon}@avcisi_firsat_bot</a>
-    <a href="https://t.me/avcisi_firsat_bot" style="background:var(--ink);color:#fff;padding:6px 12px;border-radius:999px;font-size:13px">${tgIcon}Telegram Kanalı</a>
-    <span class="meta">Sitemap & robots hazır</span>
+  <div class="card pad" style="background:#f9fafb;border:1px solid var(--line);color:var(--muted);font-size:13px">
+    Güncel rehberler • Yazar: Eylül • Son güncelleme: 29 Ağustos 2026 • 6 özgün yazı • Haftalık güncellenir
   </div>
 </section>
 ${footer()}
@@ -263,7 +248,7 @@ function searchRoute(){
   const hot='https://search.hotellook.com/hotels?city='+encodeURIComponent(to);
   const car='https://www.rentalcars.com/en/city/'+encodeURIComponent(to);
   box.style.display='block';
-  box.innerHTML='<b>'+from+' → '+to+'</b> için anlık linkler hazır. Telegram botu daha hızlı, ama buradan da bakabilirsin:<br><br><a class=btn href=\\''+avia+'\\' target=_blank>✈️ Uçuş Ara</a> <a class=btn out href=\\''+hot+'\\' target=_blank style=\\'margin-left:6px\\'>🏨 Otel Ara</a> <a class=btn out href=\\''+car+'\\' target=_blank style=\\'margin-left:6px\\'>🚗 Araç</a><br><br><span class=meta>Telegram\\'da <code>'+from+' - '+to+'</code> yazınca aynı linkler şeffaf buton + görselle gelir.</span>';
+  box.innerHTML='<b>'+from+' → '+to+'</b> için linkler hazır:<br><br><a class=btn href=\\''+avia+'\\' target=_blank>✈️ Uçuş Ara</a> <a class=btn out href=\\''+hot+'\\' target=_blank style=\\'margin-left:6px\\'>🏨 Otel Ara</a> <a class=btn out href=\\''+car+'\\' target=_blank style=\\'margin-left:6px\\'>🚗 Araç</a>';
 }
 </script>
 </body></html>`;
@@ -302,9 +287,6 @@ export function renderPost(slug: string): string | null {
       <p><em style="color:var(--muted)">${p.excerpt}</em></p>
       <img src="${p.cover}" alt="${p.title}" style="width:100%;border-radius:16px;margin:12px 0" loading="lazy">
       <div style="line-height:1.8">${p.content}</div>
-      <div style="margin-top:24px;padding:16px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:16px">
-        <strong>💡 İpucu:</strong> Bu rotayı botumda dene — Telegram'da <a href="https://t.me/avcisi_firsat_bot">@avcisi_firsat_bot</a>'a <code>${p.title.split(' ')[0]} - Paris</code> yaz.
-      </div>
       <p><a href="/blog">← Tüm rehberlere dön</a> • <a href="/">Ana sayfa</a></p>
     </article>
   `;
