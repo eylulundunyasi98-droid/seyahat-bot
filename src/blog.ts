@@ -116,11 +116,11 @@ function baseHead(title: string, desc: string): string {
 const tgIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="#0ea5e9" style="vertical-align:-3px;margin-right:4px"><path d="M12 2a10 10 0 1010 10A10 10 0 0012 2zm3.6 7.2l-1.4 6.6a1 1 0 01-.8.7l-2.3.2-1.3-1.2 2.1-2-.1-.1-3 1.9-.9-.9 6-3.8a.5.5 0 01.7.4z"/></svg>`;
 
 function header(): string {
-  return `<header class="nav"><div class="wrap navin"><a class="logo" href="/">✈️ Seyahat<span>Rehberi</span></a><nav><a href="/blog">Blog</a><a href="#ara">Keşfet</a><a href="/sitemap.xml">Sitemap</a><a class="cta" href="/blog" style="background:#0ea5e9">Rehberleri Oku</a></nav></div></header>`;
+  return `<header class="nav"><div class="wrap navin"><a class="logo" href="/"><span style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:linear-gradient(135deg,#0ea5e9,#6366f1);border-radius:9px;color:#fff;margin-right:8px;font-size:16px">✈️</span>Seyahat<span>Rehberi</span> <small style="font-weight:500;color:var(--muted);font-size:11px;margin-left:6px;letter-spacing:.04em">2026 • ÖZGÜN</small></a><nav><a href="/blog">📝 Blog</a><a href="#ara">🔍 Keşfet</a><a href="/sitemap">🗺️ Sitemap</a><a class="cta" href="/blog" style="background:linear-gradient(135deg,#0ea5e9,#6366f1)">Rehberler →</a></nav></div></header>`;
 }
 
 function footer(): string {
-  return `<footer class="foot"><div class="wrap" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px"><div>© 2026 Seyahat Rehberi — Dürüst ve özgün gezi yazıları.</div><div><a href="/blog">Blog</a> • <a href="/sitemap.xml">Sitemap</a> • <a href="/robots.txt">Robots</a></div></div></footer>`;
+  return `<footer class="foot"><div class="wrap" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px"><div>© 2026 Seyahat Rehberi — Dürüst ve özgün gezi yazıları.</div><div><a href="/blog">Blog</a> • <a href="/sitemap">Sitemap</a> • <a href="/robots.txt">Robots</a></div></div></footer>`;
 }
 
 const style = `<style>
@@ -227,8 +227,8 @@ ${header()}
 </section>
 
 <section class="wrap" style="padding:8px 20px">
-  <h2>Son rehberler — yatay kaydır →</h2>
-  <div class="hscroll">${cards}</div>
+  <h2>Son rehberler — otomatik kayıyor ✨</h2>
+  <div class="hscroll" id="autoScroll">${cards}${cards}</div>
   <p><a class="btn out" href="/blog">Tüm rehberleri Gör →</a></p>
 </section>
 
@@ -250,6 +250,22 @@ function searchRoute(){
   box.style.display='block';
   box.innerHTML='<b>'+from+' → '+to+'</b> için linkler hazır:<br><br><a class=btn href=\\''+avia+'\\' target=_blank>✈️ Uçuş Ara</a> <a class=btn out href=\\''+hot+'\\' target=_blank style=\\'margin-left:6px\\'>🏨 Otel Ara</a> <a class=btn out href=\\''+car+'\\' target=_blank style=\\'margin-left:6px\\'>🚗 Araç</a>';
 }
+// Otomatik kayan görseller
+(function(){
+  const el=document.getElementById('autoScroll');
+  if(!el) return;
+  let pos=0, dir=1, paused=false;
+  el.addEventListener('mouseenter',()=>paused=true);
+  el.addEventListener('mouseleave',()=>paused=false);
+  el.addEventListener('touchstart',()=>paused=true,{passive:true});
+  setInterval(()=>{
+    if(paused) return;
+    pos+=dir*1.2;
+    if(pos>el.scrollWidth - el.clientWidth - 10) dir=-1;
+    if(pos<0) dir=1;
+    el.scrollLeft=pos;
+  },20);
+})();
 </script>
 </body></html>`;
 }
@@ -304,4 +320,20 @@ export function renderSitemap(): string {
     ...posts.map(p => `https://seyahat-bot.eylulundunyasi98.workers.dev/blog/${p.slug}`),
   ];
   return `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map(u=>`<url><loc>${u}</loc><lastmod>2026-08-29</lastmod></url>`).join('')}</urlset>`;
+}
+
+export function renderSitemapHTML(): string {
+  const rows = [
+    { url: "/", title: "Ana Sayfa — Seyahat Rehberi", desc: "Dünya geneli rehberler ve arama" },
+    { url: "/blog", title: "Blog — Tüm Rehberler", desc: "6 özgün gezi yazısı" },
+    ...posts.map(p => ({ url: `/blog/${p.slug}`, title: p.title, desc: p.excerpt })),
+  ];
+  const list = rows.map(r=>`<a class="card" href="${r.url}" style="display:block;padding:14px"><strong>${r.title}</strong><div class="meta">${r.desc}</div><div class="meta" style="color:var(--pri)">https://seyahat-bot.eylulundunyasi98.workers.dev${r.url}</div></a>`).join('');
+  return `<!DOCTYPE html><html lang="tr"><head>${baseHead("Sitemap — Tüm Sayfalar", "Sitemizdeki tüm sayfaların listesi. Google için /sitemap.xml kullanın.")}<style>${`
+  :root{--pri:#0ea5e9;--bg:#f8fafc;--card:#fff;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0}
+  body{margin:0;font-family:Inter,sans-serif;background:var(--bg);color:var(--ink)}
+  .wrap{max-width:800px;margin:0 auto;padding:24px 20px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;margin:10px 0}
+  .meta{color:var(--muted);font-size:12px}
+  `}</style></head><body>${header()}<div class="wrap"><h1>🗺️ Sitemap</h1><p style="color:var(--muted)">İnsanlar için liste — botlar için <a href="/sitemap.xml">/sitemap.xml</a> (XML)</p><div style="display:grid;gap:10px">${list}</div><p style="margin-top:18px"><a href="/robots.txt">robots.txt</a> • <a href="/">Ana sayfa</a></p></div>${footer()}</body></html>`;
 }

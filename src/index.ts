@@ -60,6 +60,10 @@ export default {
         const { renderSitemap } = await import('./blog');
         return new Response(renderSitemap(), { headers: { 'Content-Type': 'application/xml', ...secHeaders } });
       }
+      if (url.pathname === '/sitemap' || url.pathname === '/sitemap/') {
+        const { renderSitemapHTML } = await import('./blog');
+        return new Response(renderSitemapHTML(), { headers: { 'Content-Type': 'text/html; charset=utf-8', ...secHeaders } });
+      }
       if (url.pathname === '/robots.txt') {
         return new Response(`User-agent: *\nAllow: /\nSitemap: https://seyahat-bot.eylulundunyasi98.workers.dev/sitemap.xml`, { headers: { 'Content-Type': 'text/plain', ...secHeaders } });
       }
