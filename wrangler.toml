@@ -1,8 +1,15 @@
 name = "seyahat-bot"
 main = "src/index.ts"
 compatibility_date = "2026-08-29"
+compatibility_flags = ["nodejs_compat"]
 
 [[d1_databases]]
 binding = "DB"
 database_name = "travel_db"
 database_id = "28c617c1-e1ae-410e-9f29-89c0b3897b57"
+
+[vars]
+CHANNEL_ID = "-1004391209534"
+
+[triggers]
+crons = ["0 */6 * * *", "0 9 * * *"]

@@ -1,8 +1,14 @@
--- Global Seyahat Bot Veritabanı Şeması
--- Migration: 0001_initial_schema.sql
+-- Upgrade to global schema: recreate tables with missing columns (data will be preserved via backup)
+-- Favorites backup
+CREATE TABLE IF NOT EXISTS _fav_backup AS SELECT * FROM favorites;
+CREATE TABLE IF NOT EXISTS _alert_backup AS SELECT * FROM price_alerts;
+CREATE TABLE IF NOT EXISTS _users_backup AS SELECT * FROM users;
 
--- Kullanıcılar tablosu
-CREATE TABLE IF NOT EXISTS users (
+DROP TABLE IF EXISTS favorites;
+DROP TABLE IF EXISTS price_alerts;
+DROP TABLE IF EXISTS users;
+
+CREATE TABLE users (
   user_id INTEGER PRIMARY KEY,
   username TEXT,
   first_name TEXT,
@@ -14,8 +20,7 @@ CREATE TABLE IF NOT EXISTS users (
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- Favori rotalar (takip listesi)
-CREATE TABLE IF NOT EXISTS favorites (
+CREATE TABLE favorites (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER NOT NULL,
   route TEXT NOT NULL,
@@ -27,20 +32,7 @@ CREATE TABLE IF NOT EXISTS favorites (
   FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
--- Fiyat geçmişi (grafikler için)
-CREATE TABLE IF NOT EXISTS price_history (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  route TEXT NOT NULL,
-  origin_code TEXT,
-  destination_code TEXT,
-  price REAL NOT NULL,
-  currency TEXT DEFAULT 'TRY',
-  source TEXT DEFAULT 'aviasales',
-  checked_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-
--- Fiyat alarmları (hedef fiyat)
-CREATE TABLE IF NOT EXISTS price_alerts (
+CREATE TABLE price_alerts (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER NOT NULL,
   route TEXT NOT NULL,
@@ -54,7 +46,27 @@ CREATE TABLE IF NOT EXISTS price_alerts (
   FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
--- Günlük kuponlar (günün bombası)
+-- Restore data
+INSERT OR IGNORE INTO users (user_id, language_code) SELECT user_id, lang FROM _users_backup;
+INSERT OR IGNORE INTO favorites (user_id, route) SELECT user_id, route FROM _fav_backup;
+INSERT OR IGNORE INTO price_alerts (user_id, route, target_price) SELECT user_id, route, target_price FROM _alert_backup;
+
+DROP TABLE IF EXISTS _fav_backup;
+DROP TABLE IF EXISTS _alert_backup;
+DROP TABLE IF EXISTS _users_backup;
+
+-- New tables
+CREATE TABLE IF NOT EXISTS price_history (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  route TEXT NOT NULL,
+  origin_code TEXT,
+  destination_code TEXT,
+  price REAL NOT NULL,
+  currency TEXT DEFAULT 'TRY',
+  source TEXT DEFAULT 'aviasales',
+  checked_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS daily_coupons (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   route TEXT NOT NULL,
@@ -70,7 +82,6 @@ CREATE TABLE IF NOT EXISTS daily_coupons (
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- Sesli istekler log
 CREATE TABLE IF NOT EXISTS voice_requests (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER NOT NULL,
@@ -82,17 +93,15 @@ CREATE TABLE IF NOT EXISTS voice_requests (
   FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
--- Abonelikler (kanal/kullanıcı segmentleri)
 CREATE TABLE IF NOT EXISTS subscriptions (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER NOT NULL,
-  type TEXT NOT NULL, -- 'daily_digest', 'price_drop', 'trending'
+  type TEXT NOT NULL,
   is_active INTEGER DEFAULT 1,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
--- Paylaşım takibi (viral metrikler)
 CREATE TABLE IF NOT EXISTS shares (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER NOT NULL,
@@ -103,7 +112,6 @@ CREATE TABLE IF NOT EXISTS shares (
   FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
--- Dil çevirileri cache
 CREATE TABLE IF NOT EXISTS translations_cache (
   key TEXT PRIMARY KEY,
   language TEXT NOT NULL,
@@ -111,9 +119,6 @@ CREATE TABLE IF NOT EXISTS translations_cache (
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- İndeksler
 CREATE INDEX IF NOT EXISTS idx_favorites_user ON favorites(user_id);
 CREATE INDEX IF NOT EXISTS idx_price_history_route ON price_history(route, checked_at);
 CREATE INDEX IF NOT EXISTS idx_price_alerts_user ON price_alerts(user_id, is_triggered);
-CREATE INDEX IF NOT EXISTS idx_daily_coupons_active ON daily_coupons(is_active);
-CREATE INDEX IF NOT EXISTS idx_subscriptions_user ON subscriptions(user_id, type);

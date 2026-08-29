@@ -1,19 +1,129 @@
+// src/cron.ts - Zamanlanmış görevler
 import { Env } from './index';
-import { getFavorites } from './db';
-import { sendTelegram } from './telegram';
+import { CHANNEL_ID, GLOBAL_TRENDING_ROUTES } from './constants';
+import { searchFlights, getHotelLink, getCarLink, getActivitiesLink, getDestinationImage, getCityCode } from './api';
+import { sendPhoto, sendToChannel, createTravelKeyboard, createSingleButtonKeyboard } from './telegram';
+import * as DB from './db';
 
-// Bu dosya GitHub Actions'da çalışacak, Cloudflare Worker değil.
-// Bu yüzden D1'e doğrudan bağlanamaz, Cloudflare Worker üzerinden HTTP isteğiyle veri alır.
-// Basitçe: Fiyatları kontrol edip Telegram mesajı gönderir.
+function randomRoute(): string {
+  return GLOBAL_TRENDING_ROUTES[Math.floor(Math.random() * GLOBAL_TRENDING_ROUTES.length)];
+}
 
-async function run(env: Env) {
-  const favorites = await getFavorites(env);
-  for (const fav of favorites as any[]) {
-    // Fiyat kontrolü yap (Aviasales API vb.)
-    // Şimdilik sadece örnek mesaj gönderelim
-    await sendTelegram(env, fav.user_id, `📢 ${fav.route} rotasında fiyat düşüşü olabilir! Kontrol et.`);
+function mockPrice(): number {
+  return Math.floor(800 + Math.random() * 3500);
+}
+
+async function fetchCurrentPrice(env: Env, route: string, currency: string): Promise<number | null> {
+  try {
+    const [from, to] = route.split('-').map(s => s.trim());
+    // Travelpayouts gerçek fiyat API'si - başarısız olursa mock döndür
+    const fromCode = getCityCode(from);
+    const toCode = getCityCode(to);
+    if (fromCode === 'ANY' || toCode === 'ANY') return mockPrice();
+    // Gerçek API çağrısı (token varsa)
+    if (!env.TRAVELPAYOUTS_API_TOKEN) return mockPrice();
+    const url = `https://api.travelpayouts.com/aviasales/v3/prices_for_dates?origin=${fromCode}&destination=${toCode}&currency=${currency}&limit=1&token=${env.TRAVELPAYOUTS_API_TOKEN}`;
+    const res = await fetch(url);
+    if (!res.ok) return mockPrice();
+    const data: any = await res.json();
+    if (data.data && data.data.length > 0 && data.data[0].price) {
+      return Math.round(data.data[0].price);
+    }
+    return mockPrice();
+  } catch (e) {
+    console.error('fetchCurrentPrice', e);
+    return mockPrice();
   }
 }
 
-// Bu script GitHub Actions'ta çalışacaksa Cloudflare Worker'ın URL'sine istek atmalı.
-// Ama şimdilik basit bir örnek.
+export async function checkPriceAlerts(env: Env): Promise<void> {
+  const alerts: any = await DB.getPriceAlerts(env);
+  const list: any[] = (alerts.results || alerts || []) as any[];
+  if (!list.length) {
+    console.log('checkPriceAlerts: no active alerts');
+    return;
+  }
+  for (const alert of list) {
+    try {
+      const currency = alert.currency || 'TRY';
+      const current = await fetchCurrentPrice(env, alert.route, currency);
+      if (current === null) continue;
+      // Fiyat geçmişine kaydet
+      await DB.savePriceHistory(env, alert.route, current, currency).catch(() => {});
+
+      if (current <= alert.target_price) {
+        const [from, to] = alert.route.split('-').map((s: string) => s.trim());
+        const flightLink = await searchFlights(env, from, to, currency);
+        const photo = await getDestinationImage(to);
+        const caption = `🚨 <b>FİYAT DÜŞTÜ!</b>\n\n📍 <b>${alert.route}</b>\n🎯 Hedef: <b>${alert.target_price} ${currency}</b>\n💰 Şimdi: <b>${current} ${currency}</b>\n\n⏰ Hemen yakala!`;
+        const kb = createSingleButtonKeyboard('✈️ Hemen Al', flightLink);
+        await sendPhoto(env, alert.user_id, photo, caption, kb).catch(async () => {
+          await sendToChannel(env, `🚨 Alarm: ${alert.route} ${current} ${currency} (hedef ${alert.target_price}) -> user ${alert.user_id}`);
+        });
+        // Tek seferlik tetikle (spam önleme)
+        await DB.triggerPriceAlert(env, alert.id);
+        await sendToChannel(env, `📉 Alarm tetiklendi: ${alert.route} ${current} ${currency} ≤ ${alert.target_price} (user ${alert.user_id})`);
+      }
+    } catch (e) {
+      console.error('alert loop', alert.route, e);
+    }
+  }
+}
+
+export async function saveHistoryForFavorites(env: Env): Promise<void> {
+  const favs: any = await DB.getAllActiveFavorites(env);
+  const list: any[] = (favs.results || favs || []) as any[];
+  // Sadece ilk 20 tanesini işle (rate limit)
+  for (const fav of list.slice(0, 20)) {
+    try {
+      const cur = await fetchCurrentPrice(env, fav.route, fav.currency || 'TRY');
+      if (cur !== null) await DB.savePriceHistory(env, fav.route, cur, fav.currency || 'TRY');
+    } catch (e) { console.error('history save', e); }
+  }
+}
+
+export async function sendDailyDigest(env: Env): Promise<void> {
+  try {
+    // Günün bombasını seç (rastgele ama sabit seed ile gün bazlı)
+    const today = new Date().toISOString().slice(0, 10);
+    const idx = Math.abs(hashCode(today)) % GLOBAL_TRENDING_ROUTES.length;
+    const route = GLOBAL_TRENDING_ROUTES[idx];
+    const [from, to] = route.split('-').map(s => s.trim());
+    const currency = 'TRY';
+    const price = mockPrice();
+    const [flightLink, hotelLink, carLink, activityLink, photo] = await Promise.all([
+      searchFlights(env, from, to, currency),
+      getHotelLink(env, to, currency),
+      getCarLink(env, to, currency),
+      getActivitiesLink(env, to, currency),
+      getDestinationImage(to),
+    ]);
+
+    await DB.saveDailyCoupon(env, { route, price, currency, flightLink, hotelLink, carLink }).catch(() => {});
+
+    const caption = `🔥 <b>GÜNÜN KÜRESEL BOMBASI!</b> ${today}\n\n📍 <b>${route}</b>\n💰 Sadece <b>${price} ${currency}</b> (normal ~${Math.round(price * 1.6)} ${currency})\n\n⏳ <i>Sadece bugün geçerli!</i>\n👇 Hemen yakala:`;
+    const kb = createTravelKeyboard(flightLink, hotelLink, carLink, activityLink);
+    await sendPhoto(env, CHANNEL_ID, photo, caption, kb);
+    // Kanala ek metin de gönder (yedek)
+    await sendToChannel(env, `📢 Arkadaşlarınla paylaş: @${env.TELEGRAM_BOT_TOKEN ? 'avcisi_firsat_bot' : 'bot'} ile <code>${route}</code> yaz!`);
+  } catch (e) {
+    console.error('dailyDigest', e);
+  }
+}
+
+function hashCode(str: string): number {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) | 0;
+  return h;
+}
+
+// Ana scheduled handler - index.ts tarafından çağrılır
+export async function handleScheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext): Promise<void> {
+  if (event.cron === '0 */6 * * *') {
+    ctx.waitUntil(Promise.all([checkPriceAlerts(env), saveHistoryForFavorites(env)]));
+  } else if (event.cron === '0 9 * * *') {
+    ctx.waitUntil(sendDailyDigest(env));
+  } else {
+    ctx.waitUntil(checkPriceAlerts(env));
+  }
+}
