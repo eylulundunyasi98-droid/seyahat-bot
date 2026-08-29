@@ -7,6 +7,7 @@ export interface Env {
   TELEGRAM_BOT_TOKEN: string;
   TRAVELPAYOUTS_API_TOKEN: string;
   TRAVELPAYOUTS_MARKER: string;
+  TRAVELPAYOUTS_TRS?: string;
   OPENAI_API_KEY?: string;
   CHANNEL_ID?: string;
 }

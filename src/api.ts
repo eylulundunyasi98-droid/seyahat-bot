@@ -149,21 +149,36 @@ export function getAllCities(): string[] {
 }
 
 async function createAffiliateLink(env: Env, url: string): Promise<string> {
+  // Travelpayouts Partner Links API: https://api.travelpayouts.com/links/v1/create
+  // Gereken: X-Access-Token (API token), trs (project id), marker (numeric), shorten, links[]
+  const hasTrs = !!(env as any).TRAVELPAYOUTS_TRS;
+  const hasMarker = !!env.TRAVELPAYOUTS_MARKER && !!env.TRAVELPAYOUTS_API_TOKEN;
+  if (!hasMarker || !hasTrs) {
+    // Token/marker yoksa direkt linki kısa linke çevir (kazanç yok ama çalışır)
+    try {
+      const { createShortLink } = await import('./db');
+      return await createShortLink(env, url);
+    } catch { return url; }
+  }
   try {
+    const trs = Number((env as any).TRAVELPAYOUTS_TRS);
+    const markerVal: any = isNaN(Number(env.TRAVELPAYOUTS_MARKER)) ? env.TRAVELPAYOUTS_MARKER : Number(env.TRAVELPAYOUTS_MARKER);
     const res = await fetch(`${TRAVELPAYOUTS_API}/links/v1/create`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${env.TRAVELPAYOUTS_API_TOKEN}`,
+        'X-Access-Token': env.TRAVELPAYOUTS_API_TOKEN,
       },
       body: JSON.stringify({
-        marker: env.TRAVELPAYOUTS_MARKER,
-        url: url,
+        trs,
+        marker: markerVal,
+        shorten: true,
+        links: [{ url, sub_id: 'bot' }],
       }),
     });
-    const data = await res.json() as any;
-    const affiliate = data.link ?? url;
-    // Şeffaf kısa linke çevir (tıklama takibi)
+    const data: any = await res.json();
+    const partnerUrl = data?.result?.links?.[0]?.partner_url || data?.link || null;
+    const affiliate = partnerUrl && partnerUrl.length > 5 ? partnerUrl : url;
     try {
       const { createShortLink } = await import('./db');
       return await createShortLink(env, affiliate, url);
@@ -180,7 +195,8 @@ async function createAffiliateLink(env: Env, url: string): Promise<string> {
 export async function searchFlights(env: Env, from: string, to: string, currency: string = 'TRY'): Promise<string> {
   const fromCode = getCityCode(from);
   const toCode = getCityCode(to);
-  const searchUrl = `${TRAVELPAYOUTS_API}/aviasales/v3/prices_for_dates?origin=${fromCode}&destination=${toCode}&currency=${currency}&limit=10&sorting=price&direct=false`;
+  // Kullanıcıya gösterilecek gerçek Aviasales arama sayfası (Travelpayouts bunu affiliate'e çevirecek)
+  const searchUrl = `https://www.aviasales.com/search/${fromCode}1${toCode}1?marker=${env.TRAVELPAYOUTS_MARKER || 'seyahat'}`;
   return await createAffiliateLink(env, searchUrl);
 }
 
@@ -188,7 +204,6 @@ export async function searchFlightsDirect(env: Env, from: string, to: string, cu
   const fromCode = getCityCode(from);
   const toCode = getCityCode(to);
   const url = `${TRAVELPAYOUTS_API}/aviasales/v3/prices_for_dates?origin=${fromCode}&destination=${toCode}&currency=${currency}&limit=30&sorting=price&direct=false`;
-  
   const res = await fetch(url, {
     headers: { 'Authorization': `Bearer ${env.TRAVELPAYOUTS_API_TOKEN}` },
   });
@@ -196,20 +211,18 @@ export async function searchFlightsDirect(env: Env, from: string, to: string, cu
 }
 
 export async function getHotelLink(env: Env, city: string, currency: string = 'TRY'): Promise<string> {
-  const cityCode = getCityCode(city);
-  const hotelUrl = `${TRAVELPAYOUTS_API}/hotels/search?location_id=${cityCode}&currency=${currency}&limit=10&sorting=price`;
+  // Hotellook/Booking affiliate - kullanıcı dostu
+  const hotelUrl = `https://search.hotellook.com/hotels?city=${encodeURIComponent(city)}&marker=${env.TRAVELPAYOUTS_MARKER || 'seyahat'}&currency=${currency.toLowerCase()}`;
   return await createAffiliateLink(env, hotelUrl);
 }
 
 export async function getCarLink(env: Env, city: string, currency: string = 'TRY'): Promise<string> {
-  const cityCode = getCityCode(city);
-  const carUrl = `${TRAVELPAYOUTS_API}/rentalcars/search?location_id=${cityCode}&currency=${currency}`;
+  const carUrl = `https://www.rentalcars.com/en/city/${encodeURIComponent(city)}/?marker=${env.TRAVELPAYOUTS_MARKER || 'seyahat'}`;
   return await createAffiliateLink(env, carUrl);
 }
 
 export async function getActivitiesLink(env: Env, city: string, currency: string = 'TRY'): Promise<string> {
-  const cityCode = getCityCode(city);
-  const activitiesUrl = `${TRAVELPAYOUTS_API}/klook/search?location_id=${cityCode}&currency=${currency}`;
+  const activitiesUrl = `https://www.klook.com/en-US/search/city-${encodeURIComponent(city.toLowerCase().replace(/\s+/g, '-'))}/?marker=${env.TRAVELPAYOUTS_MARKER || 'seyahat'}`;
   return await createAffiliateLink(env, activitiesUrl);
 }
 
@@ -224,7 +237,7 @@ export async function getTrendingDestinations(env: Env, currency: string = 'TRY'
 
 export async function getCheapestDatesLink(env: Env, city: string, currency: string = 'TRY'): Promise<string> {
   const cityCode = getCityCode(city);
-  const url = `${TRAVELPAYOUTS_API}/aviasales/v3/prices_for_dates?destination=${cityCode}&currency=${currency}&limit=5&sorting=price`;
+  const url = `https://www.aviasales.com/search/${cityCode}1?marker=${env.TRAVELPAYOUTS_MARKER || 'seyahat'}`;
   return await createAffiliateLink(env, url);
 }
 
