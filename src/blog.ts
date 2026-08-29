@@ -122,74 +122,93 @@ function footer(): string {
 }
 
 const style = `<style>
-:root{--pri:#0ea5e9;--pri2:#38bdf8;--bg:#f8fafc;--card:#ffffff;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--ok:#10b981}
-*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;color:var(--ink);background:var(--bg);line-height:1.65}
-a{color:var(--pri);text-decoration:none}a:hover{opacity:.9}
+:root{--pri:#0ea5e9;--pri2:#38bdf8;--bg:#f8fafc;--card:#ffffff;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;color:var(--ink);background:var(--bg);line-height:1.65;overflow-x:hidden}
+a{color:var(--pri);text-decoration:none}
 .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
-.nav{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.nav{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
 .navin{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
 .logo{font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:20px;color:var(--ink)}.logo span{color:var(--pri)}
-.nav nav a{margin-left:16px;font-weight:600;font-size:14px;color:var(--ink)}.cta{background:var(--ink);color:#fff!important;padding:8px 14px;border-radius:999px}
-.hero{padding:48px 0 28px;background:radial-gradient(800px 400px at 20% 0%, #e0f2fe 0%, transparent 60%), radial-gradient(700px 400px at 90% 10%, #fef3c7 0%, transparent 55%), linear-gradient(180deg,#fff 0%,#f8fafc 100%)}
-.hero h1{font-family:Plus Jakarta Sans,sans-serif;font-size:44px;line-height:1.05;margin:0;letter-spacing:-.02em}
+.nav nav a{margin-left:14px;font-weight:600;font-size:14px;color:var(--ink)}.cta{background:var(--ink);color:#fff!important;padding:8px 14px;border-radius:999px}
+.hero{padding:36px 0 22px;background:radial-gradient(900px 500px at 15% 0%, #e0f2fe 0%, transparent 60%), radial-gradient(700px 400px at 85% 10%, #fef3c7 0%, transparent 55%), linear-gradient(180deg,#fff 0%,#f8fafc 100%)}
+.hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px;align-items:center}
+.hero h1{font-family:Plus Jakarta Sans,sans-serif;font-size:46px;line-height:1.02;margin:0;letter-spacing:-.02em}
 .hero h1 span{background:linear-gradient(90deg,var(--pri),#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.hero p{color:var(--muted);font-size:18px;max-width:680px;margin:14px 0 0}
-.badges{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}.badge{background:#fff;border:1px solid var(--line);padding:6px 10px;border-radius:999px;font-size:12px;font-weight:600}
-.search{margin:18px 0;background:#fff;border:1px solid var(--line);border-radius:20px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.06);display:grid;grid-template-columns:1fr 1fr auto;gap:10px}
-.search input{padding:14px 14px;border:1px solid var(--line);border-radius:12px;font-size:15px}
+.hero p{color:var(--muted);font-size:17px;max-width:620px;margin:12px 0 0}
+.hero-visual{position:relative;border-radius:22px;overflow:hidden;box-shadow:0 20px 40px rgba(0,0,0,.12);height:360px;background:#000}
+.hero-visual img{width:100%;height:100%;object-fit:cover;opacity:.92}
+.hero-visual .cap{position:absolute;bottom:0;left:0;right:0;padding:14px;background:linear-gradient(transparent,rgba(0,0,0,.62));color:#fff;font-weight:700;font-size:13px}
+.badges{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.badge{background:#fff;border:1px solid var(--line);padding:6px 10px;border-radius:999px;font-size:12px;font-weight:600}
+.search{margin:16px 0;background:#fff;border:1px solid var(--line);border-radius:20px;padding:12px;box-shadow:0 10px 30px rgba(0,0,0,.06);display:grid;grid-template-columns:1fr 1fr auto;gap:10px}
+.search input{padding:14px;border:1px solid var(--line);border-radius:12px;font-size:15px}
 .search button{background:var(--pri);color:#fff;border:0;padding:14px 18px;border-radius:12px;font-weight:800;cursor:pointer}
-.search button:hover{background:#0284c7}
-.kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}
-.kpi div{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;text-align:center}
+.kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}
+.kpi div{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;text-align:center}
 .kpi strong{font-size:22px}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-@media(max-width:900px){.hero h1{font-size:32px}.grid{grid-template-columns:1fr}.search{grid-template-columns:1fr}.kpi{grid-template-columns:repeat(2,1fr)}}
+.hscroll{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 2px 12px;scrollbar-width:thin}
+.hscroll::-webkit-scrollbar{height:8px}.hscroll::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:999px}
+.hscroll .card{min-width:300px;scroll-snap-align:start}
+@media(max-width:900px){.hero-grid{grid-template-columns:1fr}.hero h1{font-size:32px}.grid{grid-template-columns:1fr}.search{grid-template-columns:1fr}.kpi{grid-template-columns:repeat(2,1fr)}.hscroll .card{min-width:260px}}
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.04);transition:.2s}
-.card:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(0,0,0,.08)}
+.card:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(0,0,0,.09)}
 .card img{width:100%;height:180px;object-fit:cover}
 .pad{padding:14px}
 .meta{color:var(--muted);font-size:12px}
 .tag{display:inline-block;background:#f1f5f9;padding:2px 8px;border-radius:999px;font-size:11px;margin-right:6px}
-.feature{padding:18px;border:1px solid var(--line);border-radius:18px;background:#fff}
+.feature{padding:16px;border:1px solid var(--line);border-radius:18px;background:#fff}
 .feature h3{margin:8px 0 6px}
+.strip{position:relative;border-radius:18px;overflow:hidden;height:280px;margin:14px 0;background:#000}
+.strip img{width:100%;height:100%;object-fit:cover;opacity:.88}
+.strip .over{position:absolute;inset:0;display:flex;align-items:center;padding:22px;background:linear-gradient(90deg, rgba(0,0,0,.58) 0%, transparent 65%)}
+.strip .over div{color:#fff;max-width:560px}
+.strip h2{margin:0 0 6px;font-family:Plus Jakarta Sans}
 .demo{background:#0f172a;color:#e2e8f0;border-radius:18px;padding:18px}
 .bubble{background:#fff;color:#0f172a;padding:10px 14px;border-radius:16px;margin:8px 0;max-width:85%}
 .bubble.me{margin-left:auto;background:#e0f2fe}
 .btn{display:inline-block;background:var(--pri);color:#fff;padding:10px 14px;border-radius:12px;font-weight:700}
 .btn.out{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.reveal{animation:up .6s ease both}@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 </style>`;
 
 export function renderLanding(): string {
-  const cards = posts.slice(0,3).map(p=>`
+  const cards = posts.slice(0,6).map(p=>`
     <a class="card" href="/blog/${p.slug}">
       <img src="${p.cover}" alt="${p.title}" loading="lazy">
       <div class="pad"><div class="meta">${p.date} • ${p.minutes} dk • ${p.tags.map(t=>`<span class=tag>${t}</span>`).join('')}</div>
-      <h3 style="margin:8px 0 6px">${p.title}</h3><p style="color:var(--muted);margin:0">${p.excerpt}</p></div>
+      <h3 style="margin:8px 0 6px;font-size:16px">${p.title}</h3><p style="color:var(--muted);margin:0;font-size:13px">${p.excerpt}</p></div>
     </a>
   `).join('');
-  return `<!DOCTYPE html><html lang="tr"><head>${baseHead("Seyahat Fırsat Botu — Dünya Geneli Ucuz Bilet, Otel ve Hava Kartı", "Telegram'da 200+ şehir, fiyat grafiği, hava + kur ve sesli arama. 4 özgün blog rehberiyle.")}
+  return `<!DOCTYPE html><html lang="tr"><head>${baseHead("Seyahat Fırsat Botu — Dünya Geneli Ucuz Bilet, Otel ve Hava Kartı", "Telegram'da 200+ şehir, fiyat grafiği, hava + kur ve sesli arama. 6 özgün blog rehberiyle.")}
 ${style}</head><body>
 ${header()}
-<section class="hero"><div class="wrap">
-  <div class="badges"><span class="badge">✈️ 200+ şehir</span><span class="badge">💱 TRY/USD/EUR/GBP</span><span class="badge">📈 Fiyat grafiği</span><span class="badge">🌤️ Hava + kur</span><span class="badge">🗣️ Sesli komut</span></div>
-  <h1>Dünya geneli <span>ucuz bilet</span> ve <span>otel fırsatı</span> tek yerde</h1>
-  <p>Telegram botu + web arama + blog rehberleri. İstanbul - Paris kadar Tokyo - New York da aynı hızda. Şeffaf butonlar, kota dostu görseller, kibar dil.</p>
-  <div id="ara" class="search">
-    <input id="from" placeholder="Nereden? İstanbul"><input id="to" placeholder="Nereye? Paris"><button onclick="searchRoute()">Ara →</button>
+<section class="hero"><div class="wrap hero-grid">
+  <div>
+    <div class="badges"><span class="badge">✈️ 200+ şehir</span><span class="badge">💱 4 para birimi</span><span class="badge">📈 Grafik</span><span class="badge">🌤️ Hava</span><span class="badge">🗣️ Sesli</span></div>
+    <h1>Dünya geneli <span>ucuz bilet</span> ve <span>otel fırsatı</span> tek yerde</h1>
+    <p>Telegram botu + web arama + blog rehberleri. İstanbul - Paris kadar Tokyo - New York da aynı hızda. Şeffaf butonlar, kota dostu görseller, kibar dil.</p>
+    <div id="ara" class="search">
+      <input id="from" placeholder="Nereden? İstanbul"><input id="to" placeholder="Nereye? Paris"><button onclick="searchRoute()">Ara →</button>
+    </div>
+    <div id="result" style="display:none" class="card pad"></div>
+    <div class="kpi"><div><strong>200+</strong><br><span class="meta">şehir</span></div><div><strong>4</strong><br><span class="meta">para birimi</span></div><div><strong>0.11s</strong><br><span class="meta">yanıt</span></div><div><strong>6</strong><br><span class="meta">rehber</span></div></div>
   </div>
-  <div id="result" style="display:none" class="card pad"></div>
-  <div class="kpi"><div><strong>200+</strong><br><span class="meta">şehir</span></div><div><strong>4</strong><br><span class="meta">para birimi</span></div><div><strong>0.11s</strong><br><span class="meta">ortalama yanıt</span></div><div><strong>11</strong><br><span class="meta">D1 tablo</span></div></div>
+  <div class="hero-visual reveal"><img src="https://images.unsplash.com/photo-1488085061387-422e29b40080?w=800" alt="Uçak ve dünya"><div class="cap">✈️ Canlı fiyat + görsel + buton — her mesajda</div></div>
 </div></section>
 
-<section class="wrap" style="padding:18px 20px">
-  <h2 style="font-family:Plus Jakarta Sans">Neden bu bot?</h2>
+<section class="wrap" style="padding:6px 20px 0">
+  <div class="strip"><img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1200" alt="Seyahat manzarası"><div class="over"><div><h2>Kaydır, keşfet, uç</h2><p>Tokyo, Bali, New York — tek kaydırma, tüm dünya. Bot dünya geneli, site de öyle.</p><a class="btn" href="#kesfet">Keşfet ↓</a></div></div></div>
+</section>
+
+<section id="kesfet" class="wrap" style="padding:18px 20px">
+  <h2 style="font-family:Plus Jakarta Sans">Neden bu bot? — scroll'la gör</h2>
   <div class="grid">
-    <div class="feature">📸 <h3>Her yanıta görsel</h3><p class="meta">Eyfel, Fuji, Marina — Unsplash kota dostu, her mesaj foto + buton.</p></div>
-    <div class="feature">🔗 <h3>Şeffaf link</h3><p class="meta">Çirkin URL yok, sadece [Uçuşu Gör] butonu → /r kısa link → affiliate.</p></div>
-    <div class="feature">📈 <h3>Fiyat grafiği</h3><p class="meta">Son 30 gün QuickChart, en düşük gün vurgulu.</p></div>
-    <div class="feature">🌤️ <h3>Hava + Kur</h3><p class="meta">Open-Meteo 3 gün + open.er-api.com anlık kur tek kartta.</p></div>
-    <div class="feature">🗣️ <h3>Sesli komut</h3><p class="meta">"Yarın İstanbul Roma kaç para?" → Whisper → rota.</p></div>
-    <div class="feature">🔥 <h3>Günün bombası</h3><p class="meta">Her gün 09:00 kanala -1004391209534'a otomatik.</p></div>
+    <div class="feature"><img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=400" style="width:100%;height:120px;object-fit:cover;border-radius:12px"><h3>📸 Her yanıta görsel</h3><p class="meta">Eyfel, Fuji, Marina — Unsplash, her mesaj foto + buton.</p></div>
+    <div class="feature"><img src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400" style="width:100%;height:120px;object-fit:cover;border-radius:12px"><h3>🔗 Şeffaf link</h3><p class="meta">Çirkin URL yok, sadece buton → /r → affiliate.</p></div>
+    <div class="feature"><img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400" style="width:100%;height:120px;object-fit:cover;border-radius:12px"><h3>📈 Fiyat grafiği</h3><p class="meta">Son 30 gün QuickChart, en düşük vurgulu.</p></div>
+    <div class="feature"><img src="https://images.unsplash.com/photo-1530908295418-a12e326966ba?w=400" style="width:100%;height:120px;object-fit:cover;border-radius:12px"><h3>🌤️ Hava + Kur</h3><p class="meta">Open-Meteo 3 gün + anlık kur tek kartta.</p></div>
+    <div class="feature"><img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400" style="width:100%;height:120px;object-fit:cover;border-radius:12px"><h3>🗣️ Sesli komut</h3><p class="meta">"Yarın İstanbul Roma?" → Whisper → rota.</p></div>
+    <div class="feature"><img src="https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=400" style="width:100%;height:120px;object-fit:cover;border-radius:12px"><h3>🔥 Günün bombası</h3><p class="meta">09:00 kanala otomatik, görsel + buton.</p></div>
   </div>
 </section>
 
@@ -204,18 +223,21 @@ ${header()}
   <p style="margin:10px 0"><a class="btn" href="https://t.me/avcisi_firsat_bot" target="_blank">Telegram'da Dene →</a> <a class="btn out" href="/blog">Blogu Oku</a></p>
 </section>
 
-<section class="wrap" style="padding:18px 20px">
-  <h2>Popüler rotalar</h2>
-  <div class="grid">
+<section class="wrap" style="padding:8px 20px">
+  <h2>Popüler rotalar — kaydır →</h2>
+  <div class="hscroll">
     <a class="card" href="#" onclick="fill('Istanbul','Paris');return false"><img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600"><div class="pad"><strong>Istanbul → Paris</strong><div class="meta">Orly kampanyaları</div></div></a>
     <a class="card" href="#" onclick="fill('Tokyo','New York');return false"><img src="https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600"><div class="pad"><strong>Tokyo → New York</strong><div class="meta">Dünya geneli kanıtı</div></div></a>
     <a class="card" href="#" onclick="fill('Berlin','Dubai');return false"><img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600"><div class="pad"><strong>Berlin → Dubai</strong><div class="meta">Kasım fırsatı</div></div></a>
+    <a class="card" href="#" onclick="fill('Rome','Barcelona');return false"><img src="https://images.unsplash.com/photo-1533105079780-92b9be482077?w=600"><div class="pad"><strong>Rome → Barcelona</strong><div class="meta">Akdeniz</div></div></a>
+    <a class="card" href="#" onclick="fill('Bali','Singapore');return false"><img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=600"><div class="pad"><strong>Bali → Singapore</strong><div class="meta">Tropik</div></div></a>
+    <a class="card" href="#" onclick="fill('London','New York');return false"><img src="https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=600"><div class="pad"><strong>London → New York</strong><div class="meta">Klasik</div></div></a>
   </div>
 </section>
 
 <section class="wrap" style="padding:8px 20px">
-  <h2>Son rehberler</h2>
-  <div class="grid">${cards}</div>
+  <h2>Son rehberler — yatay kaydır →</h2>
+  <div class="hscroll">${cards}</div>
   <p><a href="/blog">Tüm rehberler →</a></p>
 </section>
 
