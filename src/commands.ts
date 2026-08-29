@@ -170,13 +170,14 @@ export async function handleMessage(message: any, env: Env): Promise<void> {
       }
       const myRef = `https://t.me/avcisi_firsat_bot?start=ref${chatId}`;
       const count = await DB.getReferralCount(env, chatId);
-      await sendTelegram(env, chatId, UI.welcomeCaption(message.from?.first_name || '', lang) + `\n\n🔗 <b>Davet linkin:</b> ${myRef}\n👥 Davet ettiklerin: <b>${count}</b> — 3 arkadaş getir, gizli rotalar açılsın!`, createMainMenuKeyboard(lang));
+      await sendTelegram(env, chatId, UI.welcomeCaption(message.from?.first_name || '', lang), createMainMenuKeyboard(lang));
+      await sendTelegram(env, chatId, `🔗 <b>Davet Linkin</b> 👇\n👥 Toplam davet: <b>${count}</b> — 3 arkadaş getir, gizli rotalar açılsın!`, createInlineKeyboard([[{ text: '🔗 Davet Linkini Kopyala', url: myRef }], [{ text: '📢 Arkadaşlara Gönder', url: myRef }]]));
       return;
     }
     if (text.startsWith('/davet') || text.startsWith('/referral') || text.startsWith('/invite')) {
       const myRef = `https://t.me/avcisi_firsat_bot?start=ref${chatId}`;
       const count = await DB.getReferralCount(env, chatId);
-      await sendTelegram(env, chatId, `🔗 <b>Davet Linkin</b>\n${myRef}\n\n👥 Toplam davet: <b>${count}</b>\n🎁 3 arkadaş = gizli rotalar + öncelikli alarm\n\nPaylaş:`, createInlineKeyboard([[{ text: '📢 Arkadaşlara Gönder', url: myRef }]]));
+      await sendTelegram(env, chatId, `🔗 <b>Davet Linkin</b>\n👥 Toplam davet: <b>${count}</b>\n🎁 3 arkadaş = gizli rotalar + öncelikli alarm`, createInlineKeyboard([[{ text: '🔗 Davet Linkini Kopyala', url: myRef }], [{ text: '📢 Arkadaşlara Gönder', url: myRef }]]));
       return;
     }
     if (text.startsWith('/help') || text.startsWith('/yardim') || text.startsWith('/hilfe')) {
