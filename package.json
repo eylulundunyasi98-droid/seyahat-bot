@@ -1,0 +1,15 @@
+{
+  "name": "seyahat-bot",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:local": "wrangler d1 execute travel_db --local --file=./migrations/0001_initial_schema.sql",
+    "db:remote": "wrangler d1 execute travel_db --remote --file=./migrations/0001_initial_schema.sql"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240821.1",
+    "wrangler": "^3.72.0"
+  }
+}
