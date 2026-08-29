@@ -209,7 +209,7 @@ export async function handleMessage(message: any, env: Env): Promise<void> {
       }
       await DB.addFavorite(env, chatId, route, price || undefined);
       await sendTelegram(env, chatId, UI.trackingAdded(route, lang) + (price ? ` (hedef: ${formatCurrency(price, c, lang)})` : ''));
-      try { await sendToChannel(env, `🔔 <b>Yeni takip:</b> ${route}${price ? ` - ${price} ${c}` : ''} (user: ${chatId})`); } catch {}
+      // Normal kanala spam olmasın — sadece günlük bomba düşer (onay için temiz)
       return;
     }
     if (text.startsWith('/grafik') || text.startsWith('/chart')) {

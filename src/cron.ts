@@ -58,11 +58,9 @@ export async function checkPriceAlerts(env: Env): Promise<void> {
         const photo = await getDestinationImage(to);
         const caption = UI.alertCaption(alert.route, alert.target_price, current, currency);
         const kb = createSingleButtonKeyboard('✈️ Hemen Al', flightLink);
-        await sendPhoto(env, alert.user_id, photo, caption, kb).catch(async () => {
-          await sendToChannel(env, `🚨 Alarm: ${alert.route} ${current} ${currency} (hedef ${alert.target_price}) -> user ${alert.user_id}`);
-        });
+        await sendPhoto(env, alert.user_id, photo, caption, kb).catch(()=>{});
         await DB.triggerPriceAlert(env, alert.id);
-        await sendToChannel(env, `📉 Alarm tetiklendi: ${alert.route} ${current} ${currency} ≤ ${alert.target_price} (user ${alert.user_id})`);
+        // Normal kanala alarm spam olmasın — sadece kullanıcıya gider
       }
     } catch (e) {
       console.error('alert loop', alert.route, e);
