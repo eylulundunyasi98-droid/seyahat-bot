@@ -11,6 +11,7 @@ export async function upsertUser(env: Env, user: {
   last_name?: string;
   language_code?: string;
 }): Promise<void> {
+  // Dil seçimi manuel ise üstüne yazma — sadece ilk kayıtta dil ata
   await env.DB.prepare(`
     INSERT INTO users (user_id, username, first_name, last_name, language_code)
     VALUES (?, ?, ?, ?, ?)
@@ -18,7 +19,6 @@ export async function upsertUser(env: Env, user: {
       username = excluded.username,
       first_name = excluded.first_name,
       last_name = excluded.last_name,
-      language_code = excluded.language_code,
       updated_at = CURRENT_TIMESTAMP
   `).bind(
     user.user_id,
@@ -27,6 +27,7 @@ export async function upsertUser(env: Env, user: {
     user.last_name || null,
     user.language_code || 'tr'
   ).run();
+  // Eğer kullanıcı hiç yoksa dil zaten eklendi, varsa manuel seçim korunur
 }
 
 export async function getUser(env: Env, userId: number): Promise<any> {
