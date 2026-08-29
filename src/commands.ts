@@ -286,28 +286,33 @@ export async function handleMessage(message: any, env: Env): Promise<void> {
 }
 
 async function handleMenuButtons(text: string, env: Env, chatId: number, lang: string, currency: string): Promise<boolean> {
-  const map: Record<string, () => Promise<void>> = {
-    '🧭 Rota Ara': async () => { await sendTelegram(env, chatId, lang === 'tr' ? `✈️ Rota yaz lütfen: <code>İstanbul - Paris</code> veya <code>New York - Tokyo</code>\nÖrnekleri kopyalayıp gönderebilirsin.` : `✈️ Type route`, createExploreKeyboard(lang)); },
-    '🧭 Search Route': async () => { await sendTelegram(env, chatId, `✈️ Type route: <code>London - Paris</code>`); },
-    '🧭 Route Suchen': async () => { await sendTelegram(env, chatId, `✈️ Route: <code>Berlin - Paris</code>`); },
-    '🔥 Günün Bombası': async () => { await handleDailyDeal(env, chatId, lang, currency); },
-    "🔥 Today's Deal": async () => { await handleDailyDeal(env, chatId, lang, currency); },
-    '🔥 Tagesangebot': async () => { await handleDailyDeal(env, chatId, lang, currency); },
-    '🌍 Keşfet': async () => { await sendTelegram(env, chatId, lang === 'tr' ? `🌍 <b>Keşfet</b> — ne yapmak istersin?` : `🌍 Explore`, createExploreKeyboard(lang)); },
-    '🌍 Explore': async () => { await sendTelegram(env, chatId, `🌍 Explore`, createExploreKeyboard(lang)); },
-    '🌍 Entdecken': async () => { await sendTelegram(env, chatId, `🌍 Entdecken`, createExploreKeyboard(lang)); },
-    '⭐ Takip Ettiklerim': async () => { await handleFavorites(env, chatId, lang); },
-    '⭐ My Tracking': async () => { await handleFavorites(env, chatId, lang); },
-    '⭐ Meine Routen': async () => { await handleFavorites(env, chatId, lang); },
-    '⚙️ Ayarlar': async () => { await sendTelegram(env, chatId, lang === 'tr' ? `⚙️ <b>Ayarlar</b> — dil ve para birimini seç:` : `⚙️ Settings`, createLanguageKeyboard()); setTimeout(()=> sendTelegram(env, chatId, `💱`, createCurrencyKeyboard()), 400); },
-    '⚙️ Settings': async () => { await sendTelegram(env, chatId, `⚙️ Settings`, createLanguageKeyboard()); },
-    '⚙️ Einstellungen': async () => { await sendTelegram(env, chatId, `⚙️ Einstellungen`, createLanguageKeyboard()); },
-    'ℹ️ Yardım': async () => { await sendTelegram(env, chatId, UI.helpCaption(lang), createMainMenuKeyboard(lang)); },
-    'ℹ️ Help': async () => { await sendTelegram(env, chatId, UI.helpCaption(lang), createMainMenuKeyboard(lang)); },
-    'ℹ️ Hilfe': async () => { await sendTelegram(env, chatId, UI.helpCaption(lang), createMainMenuKeyboard(lang)); },
-  };
-  const fn = (map as any)[text];
-  if (fn) { await fn(); return true; }
+  const t = text.trim();
+  // Esnek eşleşme - emoji varyantları ve boşluklara toleranslı
+  if (t.includes('Rota Ara') || t.includes('Search Route') || t.includes('Route Suchen')) {
+    await sendTelegram(env, chatId, lang === 'tr' ? `✈️ Rota yaz lütfen: <code>İstanbul - Paris</code> veya <code>New York - Tokyo</code>\nÖrnekleri kopyalayıp gönderebilirsin.` : `✈️ Type route`, createExploreKeyboard(lang));
+    return true;
+  }
+  if (t.includes('Günün Bombası') || t.includes("Today's Deal") || t.includes('Tagesangebot')) {
+    await handleDailyDeal(env, chatId, lang, currency);
+    return true;
+  }
+  if (t.includes('Keşfet') || t.includes('Explore') || t.includes('Entdecken')) {
+    await sendTelegram(env, chatId, lang === 'tr' ? `🌍 <b>Keşfet</b> — ne yapmak istersin?` : `🌍 Explore`, createExploreKeyboard(lang));
+    return true;
+  }
+  if (t.includes('Takip Ettiklerim') || t.includes('My Tracking') || t.includes('Meine Routen') || t.includes('Takip')) {
+    await handleFavorites(env, chatId, lang);
+    return true;
+  }
+  if (t.includes('Ayarlar') || t.includes('Settings') || t.includes('Einstellungen')) {
+    await sendTelegram(env, chatId, lang === 'tr' ? `⚙️ <b>Ayarlar</b> — dil ve para birimini seç:` : `⚙️ Settings`, createLanguageKeyboard());
+    setTimeout(()=> sendTelegram(env, chatId, `💱 Para birimi:`, createCurrencyKeyboard()), 600);
+    return true;
+  }
+  if (t.includes('Yardım') || t.includes('Help') || t.includes('Hilfe')) {
+    await sendTelegram(env, chatId, UI.helpCaption(lang), createMainMenuKeyboard(lang));
+    return true;
+  }
   return false;
 }
 
