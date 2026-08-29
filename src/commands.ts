@@ -379,9 +379,12 @@ async function handleExchangeCard(env: Env, chatId: number, lang: string): Promi
   const rates = await getAllExchangeRates('EUR');
   if (!rates) { await sendTelegram(env, chatId, `⚠️ Kur bilgisi alınamadı.`); return; }
   const lines = (lang === 'tr' ? `💱 <b>Anlık Döviz Kurları (EUR Bazlı)</b>\n\n` : `💱 <b>Exchange Rates (EUR)</b>\n\n`) +
-    `🇹🇷 TRY: ${rates.TRY?.toFixed(2)}\n🇺🇸 USD: ${rates.USD?.toFixed(2)}\n🇬🇧 GBP: ${rates.GBP?.toFixed(2)}\n🇪🇺 EUR: 1.00\n` +
-    `\nKaynak: open.er-api.com`;
-  await sendTelegram(env, chatId, lines);
+    `🇹🇷 TRY: ${rates.TRY?.toFixed(2)}\n🇺🇸 USD: ${rates.USD?.toFixed(2)}\n🇬🇧 GBP: ${rates.GBP?.toFixed(2)}\n🇪🇺 EUR: 1.00`;
+  const kb = createInlineKeyboard([
+    [{ text: '🔗 Kaynak', url: 'https://open.er-api.com/' }],
+    [{ text: '✈️ Kanalımız', url: 'https://t.me/+TKQphsxQyIRhYjBk' }],
+  ]);
+  await sendTelegram(env, chatId, lines, kb);
 }
 
 async function handleTrending(env: Env, chatId: number, lang: string, currency: string): Promise<void> {
