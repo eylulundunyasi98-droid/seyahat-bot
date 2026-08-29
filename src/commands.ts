@@ -62,7 +62,6 @@ function getLang(user: any, fallback: string = 'tr'): string {
 }
 
 function parseTakip(text: string): { route: string; price: number | null; currency: string } {
-  // "/takip İstanbul - Paris - 1000 TL"  -> route="İstanbul - Paris", price=1000, currency="TRY"
   let raw = text.replace(/^\/(takip|track)\s*/i, '').trim();
   let currency = 'TRY';
   const m = raw.match(/(\d+(?:[.,]\d+)?)\s*(TL|TRY|USD|\$|EUR|€|GBP|£)/i);
@@ -78,6 +77,51 @@ function parseTakip(text: string): { route: string; price: number | null; curren
   }
   raw = raw.replace(/\s*-\s*$/, '').trim();
   return { route: raw, price, currency };
+}
+
+function tryParseRoute(text: string): { from: string; to: string } | null {
+  const t = text.trim();
+  // 1) "Istanbul - Paris" veya "Istanbul-Paris"
+  if (t.includes('-')) {
+    const [a, b] = t.split('-').map(s => s.trim());
+    if (a && b && a.length >= 2 && b.length >= 2 && getCityCode(a) !== 'ANY' && getCityCode(b) !== 'ANY') {
+      return { from: a, to: b };
+    }
+    // tire var ama şehir kodu ANY olsa bile rota kabul et (fallback)
+    if (a && b && a.length >= 2 && b.length >= 2 && t.length < 60) {
+      // en az 2 kelime ve tire varsa rota say
+      return { from: a, to: b };
+    }
+  }
+  // 2) "istanbul paris" (boşlukla ayrılmış 2 şehir)
+  const words = t.split(/\s+/);
+  if (words.length >= 2 && words.length <= 4 && !t.includes('/')) {
+    // Tüm metin sadece harf+boşluk ise
+    if (/^[a-zA-ZığüşöçİĞÜŞÖÇ\s]{3,50}$/.test(t)) {
+      // 2 parçaya bölmeyi dene
+      for (let i = 1; i < words.length; i++) {
+        const from = words.slice(0, i).join(' ');
+        const to = words.slice(i).join(' ');
+        if (from.length >= 2 && to.length >= 2 && getCityCode(from) !== 'ANY' && getCityCode(to) !== 'ANY') {
+          return { from, to };
+        }
+      }
+      // Şehir kodu bulunamazsa bile 2 kelime ise rota varsay (örn: "istanbul paris")
+      if (words.length === 2 && words[0].length >= 3 && words[1].length >= 3) {
+        return { from: words[0], to: words[1] };
+      }
+      if (words.length === 3) {
+        // "new york paris" -> "new york" + "paris"
+        const from2 = words.slice(0, 2).join(' ');
+        const to1 = words.slice(2).join(' ');
+        if (getCityCode(from2) !== 'ANY' && getCityCode(to1) !== 'ANY') return { from: from2, to: to1 };
+        const from1 = words[0];
+        const to2 = words.slice(1).join(' ');
+        if (getCityCode(from1) !== 'ANY' && getCityCode(to2) !== 'ANY') return { from: from1, to: to2 };
+      }
+    }
+  }
+  return null;
 }
 
 export async function handleMessage(message: any, env: Env): Promise<void> {
@@ -187,27 +231,28 @@ export async function handleMessage(message: any, env: Env): Promise<void> {
       return;
     }
 
-    // === ROTA ARAMA: "İstanbul - Paris" ===
-    if (text.includes('-') && text.length < 80) {
-      const [fromRaw, toRaw] = text.split('-').map(s => s.trim());
-      if (fromRaw && toRaw && fromRaw.length >= 2 && toRaw.length >= 2) {
-        await handleRouteSearch(env, chatId, fromRaw, toRaw, lang, currency);
-        return;
-      }
+    // === ROTA ARAMA: "İstanbul - Paris" veya "istanbul paris" ===
+    const routeParsed = tryParseRoute(text);
+    if (routeParsed) {
+      await handleRouteSearch(env, chatId, routeParsed.from, routeParsed.to, lang, currency);
+      return;
     }
 
-    // === TEK ŞEHİR: "Paris" => Hava + Kur + Otel ===
-    if (text.length >= 2 && text.length < 30 && !text.includes('/') && !text.includes('http')) {
+    // === TEK ŞEHİR: "Paris" => Hava + Kur + Otel (sadece 1 şehir) ===
+    if (text.length >= 2 && text.length < 30 && !text.includes('/') && !text.includes('http') && !text.includes('-')) {
       const city = text.trim();
-      // Eğer şehir kodu varsa, akıllı kart göster
-      if (getCityCoords(city) || getCityCode(city) !== 'ANY') {
-        await handleWeatherCard(env, chatId, city, lang, currency);
-        return;
-      }
-      // Bilinmeyen şehir: yine dene
-      if (/^[a-zA-ZığüşöçİĞÜŞÖÇ\s-]{2,30}$/.test(city)) {
-        await handleWeatherCard(env, chatId, city, lang, currency);
-        return;
+      // Sadece tek şehir ise hava kartı
+      const words = city.split(/\s+/);
+      if (words.length <= 2) {
+        if (getCityCoords(city) || getCityCode(city) !== 'ANY') {
+          await handleWeatherCard(env, chatId, city, lang, currency);
+          return;
+        }
+        // Bilinmeyen tek şehir bile olsa kibar otel önerisi (butonlu)
+        if (/^[a-zA-ZığüşöçİĞÜŞÖÇ\s]{2,30}$/.test(city) && words.length === 1) {
+          await handleWeatherCard(env, chatId, city, lang, currency);
+          return;
+        }
       }
     }
 
@@ -271,7 +316,7 @@ async function handleRouteSearch(env: Env, chatId: number, from: string, to: str
     const keyboard = createTravelKeyboard(flightLink, hotelLink, carLink, activityLink);
     const res = await sendPhoto(env, chatId, photoUrl, caption, keyboard);
     if (!res?.ok) {
-      await sendTelegram(env, chatId, `✈️ <b>${from} → ${to}</b>\n\n✈️ Uçuş: ${flightLink}\n🏨 Otel: ${hotelLink}\n🚗 Araç: ${carLink}\n🎯 Aktivite: ${activityLink}`, keyboard);
+      await sendTelegram(env, chatId, `✈️ <b>${from} → ${to}</b> için fırsatlar hazır! Butonlardan incele:`, keyboard);
     }
   } catch (e) {
     console.error('routeSearch', e);
@@ -291,7 +336,11 @@ async function handleWeatherCard(env: Env, chatId: number, city: string, lang: s
     ]);
     if (!weather) {
       const hotelOnly = await getHotelLink(env, city, currency);
-      await sendTelegram(env, chatId, lang === 'tr' ? `🏨 <b>${city}</b> için otel fırsatlarını hazırladım: ${hotelOnly}` : `🏨 Hotels in <b>${city}</b>: ${hotelOnly}`);
+      const photo = await getDestinationImage(city);
+      const caption = lang === 'tr' ? `🏨 <b>${city}</b> için en iyi otelleri hazırladım` : `🏨 Hotels in <b>${city}</b>`;
+      const kb = createSingleButtonKeyboard(lang === 'tr' ? '🏨 Otelleri Gör' : '🏨 Hotels', hotelOnly);
+      const res = await sendPhoto(env, chatId, photo, caption, kb);
+      if (!res?.ok) await sendTelegram(env, chatId, `🏨 <b>${city}</b>`, kb);
       return;
     }
     const weatherText = formatWeather(weather, coords?.name || city, lang);
