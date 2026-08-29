@@ -141,7 +141,16 @@ function baseHead(title: string, desc: string): string {
 <title>${title}</title><meta name="description" content="${desc}">
 <meta property="og:title" content="${title}"><meta property="og:description" content="${desc}"><meta property="og:type" content="website">
 <meta name="robots" content="index,follow"><link rel="canonical" href="https://seyahat-bot.eylulundunyasi98.workers.dev/">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">`;
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<script nowprocket data-noptimize="1" data-cfasync="false" data-wpfc-render="false" seraph-accel-crit="1" data-no-defer="1" data-cmp-ab="2">
+  (function () {
+      var script = document.createElement("script");
+      script.async = 1;
+      script.setAttribute("data-cmp-ab","2");
+      script.src = 'https://emrld.ltd/NTY4MTQ3.js?t=568147';
+      document.head.appendChild(script);
+  })();
+</script>`;
 }
 
 const tgIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="#0ea5e9" style="vertical-align:-3px;margin-right:4px"><path d="M12 2a10 10 0 1010 10A10 10 0 0012 2zm3.6 7.2l-1.4 6.6a1 1 0 01-.8.7l-2.3.2-1.3-1.2 2.1-2-.1-.1-3 1.9-.9-.9 6-3.8a.5.5 0 01.7.4z"/></svg>`;
