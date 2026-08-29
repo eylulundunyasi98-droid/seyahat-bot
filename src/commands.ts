@@ -152,7 +152,7 @@ export async function handleMessage(message: any, env: Env): Promise<void> {
     }
 
     // === MENÜ BUTONLARI (Reply Keyboard) ===
-    if (handleMenuButtons(text, env, chatId, lang, currency)) return;
+    if (await handleMenuButtons(text, env, chatId, lang, currency)) return;
 
     // === KOMUTLAR ===
     if (text.startsWith('/start')) {
@@ -285,7 +285,7 @@ export async function handleMessage(message: any, env: Env): Promise<void> {
   }
 }
 
-function handleMenuButtons(text: string, env: Env, chatId: number, lang: string, currency: string): boolean {
+async function handleMenuButtons(text: string, env: Env, chatId: number, lang: string, currency: string): Promise<boolean> {
   const map: Record<string, () => Promise<void>> = {
     '🧭 Rota Ara': async () => { await sendTelegram(env, chatId, lang === 'tr' ? `✈️ Rota yaz lütfen: <code>İstanbul - Paris</code> veya <code>New York - Tokyo</code>\nÖrnekleri kopyalayıp gönderebilirsin.` : `✈️ Type route`, createExploreKeyboard(lang)); },
     '🧭 Search Route': async () => { await sendTelegram(env, chatId, `✈️ Type route: <code>London - Paris</code>`); },
@@ -307,7 +307,7 @@ function handleMenuButtons(text: string, env: Env, chatId: number, lang: string,
     'ℹ️ Hilfe': async () => { await sendTelegram(env, chatId, UI.helpCaption(lang), createMainMenuKeyboard(lang)); },
   };
   const fn = (map as any)[text];
-  if (fn) { fn(); return true; }
+  if (fn) { await fn(); return true; }
   return false;
 }
 
