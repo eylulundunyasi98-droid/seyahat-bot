@@ -101,10 +101,10 @@ export async function sendDailyDigest(env: Env): Promise<void> {
 
     await DB.saveDailyCoupon(env, { route, price, currency, flightLink, hotelLink, carLink }).catch(() => {});
 
-    const caption = UI.dailyCaption(route, price, currency, today);
-    const kb = createTravelKeyboard(flightLink, hotelLink, carLink, activityLink);
+    const caption = UI.dailyCaption(route, price, currency, today) + `\n\n🤖 Bot: @avcisi_firsat_bot`;
+    const kbBase = createTravelKeyboard(flightLink, hotelLink, carLink, activityLink);
+    const kb = { inline_keyboard: [...(kbBase.inline_keyboard || []), [{ text: '🤖 Bot ile Ara', url: 'https://t.me/avcisi_firsat_bot?start=channel' }]] };
     await sendPhoto(env, CHANNEL_ID, photo, caption, kb);
-    await sendToChannel(env, `📢 Arkadaşlarınla paylaş: @avcisi_firsat_bot ile <code>${route}</code> yaz!`);
   } catch (e) {
     console.error('dailyDigest', e);
   }
