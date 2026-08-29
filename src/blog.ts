@@ -147,7 +147,7 @@ function baseHead(title: string, desc: string): string {
 const tgIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="#0ea5e9" style="vertical-align:-3px;margin-right:4px"><path d="M12 2a10 10 0 1010 10A10 10 0 0012 2zm3.6 7.2l-1.4 6.6a1 1 0 01-.8.7l-2.3.2-1.3-1.2 2.1-2-.1-.1-3 1.9-.9-.9 6-3.8a.5.5 0 01.7.4z"/></svg>`;
 
 function header(): string {
-  return `<header class="nav"><div class="wrap navin"><a class="logo" href="/"><span style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:linear-gradient(135deg,#0ea5e9,#6366f1);border-radius:9px;color:#fff;margin-right:8px;font-size:16px">✈️</span>Seyahat<span>Rehberi</span> <small style="font-weight:500;color:var(--muted);font-size:11px;margin-left:6px;letter-spacing:.04em">2026 • ÖZGÜN</small></a><nav><a href="/blog">📝 Blog</a><a href="#ara">🔍 Keşfet</a><a href="/sitemap">🗺️ Sitemap</a><a class="cta" href="/blog" style="background:linear-gradient(135deg,#0ea5e9,#6366f1)">Rehberler →</a></nav></div></header>`;
+  return `<header class="nav"><div class="wrap navin"><a class="logo" href="/"><span style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:linear-gradient(135deg,#0ea5e9,#6366f1);border-radius:9px;color:#fff;margin-right:8px;font-size:16px">✈️</span>Seyahat<span>Rehberi</span> <small style="font-weight:500;color:var(--muted);font-size:11px;margin-left:6px;letter-spacing:.04em">2026 • ÖZGÜN</small></a><nav><a href="/blog">📝 Blog</a><a href="#ara">🔍 Keşfet</a><a href="/sitemap">🗺️ Sitemap</a><a class="cta" href="https://t.me/avcisi_firsat_bot" target="_blank" style="background:linear-gradient(135deg,#0ea5e9,#6366f1)">✈️ Telegram'da Aç</a></nav></div></header>`;
 }
 
 function footer(): string {
@@ -258,8 +258,8 @@ ${header()}
 </section>
 
 <section class="wrap" style="padding:8px 20px">
-  <h2>Son rehberler — otomatik kayıyor ✨</h2>
-  <div class="hscroll" id="autoScroll">${cards}${cards}</div>
+  <h2>Son rehberler</h2>
+  <div class="hscroll">${cards}</div>
   <p><a class="btn out" href="/blog">Tüm rehberleri Gör →</a></p>
 </section>
 
@@ -281,22 +281,6 @@ function searchRoute(){
   box.style.display='block';
   box.innerHTML='<b>'+from+' → '+to+'</b> için linkler hazır:<br><br><a class=btn href=\\''+avia+'\\' target=_blank>✈️ Uçuş Ara</a> <a class=btn out href=\\''+hot+'\\' target=_blank style=\\'margin-left:6px\\'>🏨 Otel Ara</a> <a class=btn out href=\\''+car+'\\' target=_blank style=\\'margin-left:6px\\'>🚗 Araç</a>';
 }
-// Otomatik kayan görseller
-(function(){
-  const el=document.getElementById('autoScroll');
-  if(!el) return;
-  let pos=0, dir=1, paused=false;
-  el.addEventListener('mouseenter',()=>paused=true);
-  el.addEventListener('mouseleave',()=>paused=false);
-  el.addEventListener('touchstart',()=>paused=true,{passive:true});
-  setInterval(()=>{
-    if(paused) return;
-    pos+=dir*1.2;
-    if(pos>el.scrollWidth - el.clientWidth - 10) dir=-1;
-    if(pos<0) dir=1;
-    el.scrollLeft=pos;
-  },20);
-})();
 </script>
 </body></html>`;
 }
