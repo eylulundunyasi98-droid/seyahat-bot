@@ -230,8 +230,17 @@ export async function getTrendingDestinations(env: Env, currency: string = 'TRY'
   const trending = [
     'Paris', 'London', 'New York', 'Tokyo', 'Dubai', 'Barcelona', 'Rome',
     'Amsterdam', 'Berlin', 'Vienna', 'Prague', 'Budapest', 'Lisbon', 'Istanbul',
-    'Bangkok', 'Singapore', 'Hong Kong', 'Sydney', 'Bali', 'Cancun', 'Rio de Janeiro'
+    'Bangkok', 'Singapore', 'Hong Kong', 'Sydney', 'Bali', 'Cancun', 'Rio de Janeiro',
+    'Lima', 'Santiago', 'Buenos Aires', 'Mexico City', 'Vancouver', 'Toronto',
+    'Cairo', 'Marrakech', 'Cape Town', 'Nairobi', 'Johannesburg', 'Seoul', 'Beijing',
+    'Delhi', 'Mumbai', 'Jakarta', 'Manila', 'Hanoi', 'Auckland', 'Melbourne', 'Lima',
+    'Oslo', 'Helsinki', 'Stockholm', 'Reykjavik', 'Athens', 'Istanbul', 'Antalya'
   ];
+  // Her çağrıda karıştır — vitrin hep farklı kıtalar göstersin
+  for (let i = trending.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [trending[i], trending[j]] = [trending[j], trending[i]];
+  }
   return trending;
 }
 

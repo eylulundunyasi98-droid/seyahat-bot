@@ -214,7 +214,9 @@ a{color:var(--pri);text-decoration:none}
 </style>`;
 
 export function renderLanding(): string {
-  const cards = posts.slice(0,6).map(p=>`
+  // Her açılışta farklı 6 rehber — dünya hissi
+  const shuffled = [...posts].sort(()=>Math.random()-0.5).slice(0,6);
+  const cards = shuffled.map(p=>`
     <a class="card" href="/blog/${p.slug}">
       <img src="${p.cover}" alt="${p.title}" loading="lazy">
       <div class="pad"><div class="meta">${p.date} • ${p.minutes} dk • ${p.tags.map(t=>`<span class=tag>${t}</span>`).join('')}</div>
@@ -290,6 +292,14 @@ function searchRoute(){
   box.style.display='block';
   box.innerHTML='<b>'+from+' → '+to+'</b> için linkler hazır:<br><br><a class=btn href=\\''+avia+'\\' target=_blank>✈️ Uçuş Ara</a> <a class=btn out href=\\''+hot+'\\' target=_blank style=\\'margin-left:6px\\'>🏨 Otel Ara</a> <a class=btn out href=\\''+car+'\\' target=_blank style=\\'margin-left:6px\\'>🚗 Araç</a>';
 }
+// Popüler rotalar ve son rehberler her açılışta karışsın — dünya hissi
+(function(){
+  document.querySelectorAll('.hscroll').forEach(el=>{
+    const cards=[...el.children];
+    for(let i=cards.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[cards[i],cards[j]]=[cards[j],cards[i]]}
+    cards.forEach(c=>el.appendChild(c));
+  });
+})();
 </script>
 </body></html>`;
 }
