@@ -41,7 +41,11 @@ export default {
       if (url.pathname === '/health') {
         return new Response(JSON.stringify({ ok: true, worker: 'seyahat-bot', time: new Date().toISOString() }), { headers: { 'Content-Type': 'application/json', ...secHeaders } });
       }
-      if (url.pathname === '/' || url.pathname === '/blog' || url.pathname === '/blog/') {
+      if (url.pathname === '/' ) {
+        const { renderLanding } = await import('./blog');
+        return new Response(renderLanding(), { headers: { 'Content-Type': 'text/html; charset=utf-8', ...secHeaders } });
+      }
+      if (url.pathname === '/blog' || url.pathname === '/blog/') {
         const { renderBlogIndex } = await import('./blog');
         return new Response(renderBlogIndex(), { headers: { 'Content-Type': 'text/html; charset=utf-8', ...secHeaders } });
       }

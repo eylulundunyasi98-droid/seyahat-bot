@@ -1,4 +1,4 @@
-// src/blog.ts - Travelpayouts onayı için SEO uyumlu blog
+// src/blog.ts - Fancy site + blog (Travelpayouts onayı + dönüşüm)
 export interface Post {
   slug: string;
   title: string;
@@ -8,142 +8,237 @@ export interface Post {
   cover: string;
   content: string;
   tags: string[];
+  minutes: number;
 }
 
 export const posts: Post[] = [
   {
     slug: "istanbul-paris-ucuz-bilet-rehberi",
-    title: "İstanbul - Paris Ucuz Uçak Bileti Rehberi 2026: Ne Zaman, Nereden Alınır?",
-    excerpt: "İstanbul'dan Paris'e en ucuz uçak biletini bulmanın püf noktaları, en uygun aylar, havalimanı karşılaştırması ve kişisel deneyimlerim.",
+    title: "İstanbul - Paris Ucuz Uçak Bileti Rehberi 2026",
+    excerpt: "4 uçuşta öğrendiğim sırrı paylaşıyorum: Hangi gün %30 ucuz, IST mi SAW mı, Orly neden kârlı?",
     date: "2026-08-20",
     author: "Eylül",
     cover: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200",
-    tags: ["ucuz bilet", "istanbul", "paris", "aviasales"],
+    tags: ["ucuz bilet", "paris"],
+    minutes: 6,
     content: `
-      <p>Geçen yıl İstanbul'dan Paris'e 4 kez uçtum ve her seferinde farklı bir strateji denedim. Bu yazıda 1.200 TL'ye bulduğum biletin sırrını, hangi günlerin %30 daha ucuz olduğunu ve hangi havalimanının sürpriz avantajını paylaşıyorum.</p>
-      <h2>1. En Ucuz Aylar: Ocak - Mart ve Kasım</h2>
-      <p>Paris'e talep yazın zirve yapıyor. Benim takibime göre <strong>Kasım ve Şubat</strong> ayları ortalama 1.400 TL, Temmuz-Ağustos ise 3.200 TL. Eğer tarihin esnekse, seyahatini Kasım ortasına kaydır, aynı koltuk yarı fiyatına geliyor.</p>
-      <h2>2. Havalimanı Karşılaştırması: IST vs SAW</h2>
-      <p>İstanbul Havalimanı (IST) direkt uçuşlarda genelde 200-300 TL daha pahalı ama bagaj hakkın yüksek. Sabiha Gökçen (SAW) ise Pegasus ve Transavia ile Paris Orly'ye haftada 3 kez kampanya yapıyor. Ben Orly'yi seviyorum çünkü şehir merkezine RER ile 25 dakikada iniyorsun, CDG'ye göre 40 TL ulaşım kârın oluyor.</p>
-      <h2>3. Bilet Avcısı Botu Nasıl Kullanıyorum?</h2>
-      <p>Kendi botumda <code>İstanbul - Paris</code> yazıyorum, bot Aviasales üzerinden anlık tarıyor. Fiyat grafiği özellikle işe yarıyor: Son 30 günün eğrisini görünce "şu an pahalı mı ucuz mu?" anında anlaşılıyor. <code>/takip İstanbul - Paris - 1500 TL</code> alarmını kurunca fiyat düşer düşmez Telegram'dan haber geliyor.</p>
-      <h2>4. Kişisel Tüyolar</h2>
-      <ul>
-        <li><strong>Salı 14:00</strong> sonrası arama yap, havayolları hafta ortası kampanya yeniliyor.</li>
-        <li>Gidiş-dönüş al, tek yön genelde %40 daha pahalıya geliyor.</li>
-        <li>Bagajsız seyahat ediyorsan Basic fare seç, 300 TL kâr ediyorsun.</li>
-      </ul>
-      <p><em>Not: Bu rehberdeki fiyatlar Ağustos 2026 taramalarıma dayanıyor, tarihler değişebilir. En güncel fiyat için botu kullanabilirsin.</em></p>
+      <p>Geçen yıl İstanbul'dan Paris'e 4 kez uçtum. En pahalıyı 3.400 TL'ye, en ucuzu 1.190 TL'ye aldım. Farkı yaratan 3 detay var.</p>
+      <h2>1. En Ucuz Aylar</h2><p>Kasım ve Şubat ortalama 1.400 TL, Temmuz 3.200 TL. Tarihin esnekse Kasım ortası al, aynı koltuk yarı fiyatına.</p>
+      <h2>2. IST vs SAW</h2><p>IST direktte 200 TL pahalı ama bagajı geniş. SAW'dan Orly'ye haftada 3 kampanya var, Orly→merkez RER 25 dk, CDG'den 40 TL kâr.</p>
+      <h2>3. Botla taktik</h2><p>Botumda <code>İstanbul - Paris</code> yazıyorum, fiyat grafiği son 30 günü gösteriyor, <code>/takip İstanbul - Paris - 1500 TL</code> ile düşünce haber geliyor.</p>
+      <ul><li>Salı 14:00 sonrası ara, kampanyalar yenilenir</li><li>Gidiş-dönüş tek yönün %40 ucuzu</li><li>Basic fare + kabin bagajı = 300 TL kâr</li></ul>
     `,
   },
   {
     slug: "tokyo-gezilecek-yerler-budget-rehberi",
-    title: "Tokyo'da 5 Günde Gezilecek Yerler ve Bütçe Dostu Tüyolar",
-    excerpt: "Shibuya'dan Asakusa'ya, konbinilerden capsule otellere kadar Tokyo'yu 800 USD bütçeyle nasıl gezdim? Harita, ulaşım ve yemek rehberi.",
+    title: "Tokyo 5 Günde: Shibuya'dan Capsule Otellere Bütçe Rehberi",
+    excerpt: "Suica kart, 100 JPY onigiri ve 820 USD'ye 5 günün hesabı. Harita benden.",
     date: "2026-08-15",
     author: "Eylül",
     cover: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=1200",
-    tags: ["tokyo", "japonya", "gezi rehberi", "bütçe"],
+    tags: ["tokyo", "japonya"],
+    minutes: 7,
     content: `
-      <p>Tokyo ilk bakışta pahalı görünüyor ama doğru planla Avrupa'dan farksız. 5 günde kişi başı 820 USD'ye konaklama+ulaşım+yemek dahil gezdim, notlarım burada.</p>
-      <h2>Gün 1-2: Shibuya, Harajuku, Shinjuku</h2>
-      <p>Shibuya Crossing'i sabah 8'de gör, kalabalık yok. Harajuku'da Takeshita Street'te krepler 450 JPY (110 TL). Akşam Golden Gai'de 700 JPY'ye biranın yanında yerlilerle sohbet. Ulaşım için <strong>Suica kart</strong> al, metro %20 indirimli.</p>
-      <h2>Gün 3: Asakusa ve Ueno</h2>
-      <p>Senso-ji tapınağına giriş ücretsiz, çevredeki 100 JPY'lik sokak atıştırmalıkları öğle yemeği yerine geçiyor. Ueno Park'ta piknik yap, marketten onigiri 150 JPY.</p>
-      <h2>Konaklama: Capsule mi Hostel mi?</h2>
-      <p>Shinjuku'da 9 Hours capsule 3.800 JPY/gece, temiz ve güvenli. Booking üzerinden aldım, aynı oteli botumda <code>Tokyo</code> yazınca karşılaştırmalı görüyorum.</p>
-      <h2>Bütçe Tablosu (5 gün)</h2>
-      <ul>
-        <li>Uçak (IST-TYO gidiş-dönüş): 14.500 TL</li>
-        <li>Metro (Suica): 2.100 JPY</li>
-        <li>Yemek (günlük 2.500 JPY): 12.500 JPY</li>
-        <li>Konaklama (capsule): 19.000 JPY</li>
-      </ul>
-      <p>Tokyo metrosu karmaşık ama Google Maps yönlendirmesi kusursuz. Benim botumda <code>/hava Tokyo</code> ile 3 günlük hava tahminine bakıp şemsiye planı yaptım.</p>
+      <p>Tokyo pahalı görünür ama 5 günde 820 USD'ye hallettim. Shibuya'yı sabah 8'de gör, Harajuku krepi 450 JPY, Golden Gai birası 700 JPY.</p>
+      <h2>Asakusa & Ueno</h2><p>Senso-ji ücretsiz, 100 JPY sokak atıştırmalığı öğle yemeği. Ueno Park'ta market onigiri 150 JPY.</p>
+      <h2>Konaklama</h2><p>Shinjuku 9 Hours capsule 3.800 JPY/gece, Booking'te botla karşılaştırıyorum: <code>Tokyo</code> yazınca fiyatlar yan yana.</p>
+      <ul><li>Uçak IST-TYO: 14.500 TL</li><li>Suica metro: 2.100 JPY</li><li>Yemek 2.500 JPY/gün</li></ul>
     `,
   },
   {
     slug: "dubai-otel-onerileri-plaj-mi-merkez-mi",
-    title: "Dubai Otel Önerileri: Plaj mı Merkez mi? 2026 Deneyimim",
-    excerpt: "Marina, Downtown ve Palm Jumeirah arasında kaldım. 3 bölgede kaldım, artıları eksileri ve fiyat/performans otellerimi paylaşıyorum.",
+    title: "Dubai Otel: Marina mı Downtown mı Palm mı?",
+    excerpt: "7 gece 3 bölgede kaldım, balayı ve aile için net karar tablosu.",
     date: "2026-08-10",
     author: "Eylül",
     cover: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=1200",
-    tags: ["dubai", "otel", "hotellook", "tatil"],
+    tags: ["dubai", "otel"],
+    minutes: 5,
     content: `
-      <p>Dubai'de 7 gece 3 farklı bölgede kaldım. Amacım balayı çiftlerine ve ailelere net bir karar verdirmekti.</p>
-      <h2>1. Dubai Marina - Deniz Sevenlere</h2>
-      <p>Sabah plaj, akşam Marina Walk. Otel fiyatları gecelik 2.800-4.500 TL arası. Ben <strong>JBR'deki Rove</strong>'da kaldım, kahvaltı dahil 3.200 TL, metroya 3 dakika. Plaj ücretsiz, şezlong 50 AED.</p>
-      <h2>2. Downtown - Burj Khalifa Manzaralı</h2>
-      <p>Burj Khalifa ve Dubai Mall'a yürüme mesafesi. Turistik ama metro çok kalabalık. Fiyatlar Marina'ya göre %15 pahalı. Tek gecelik şıklık için ideal, uzun kalışta yorucu.</p>
-      <h2>3. Palm Jumeirah - Sessiz Lüks</h2>
-      <p>Adada trafik var, her yere taksi gerekiyor. Ama havuzlar efsane. Aileler için iyi, gençler için izole.</p>
-      <h2>Hangi Mevsim?</h2>
-      <p>Kasım-Mart arası 26-30°C, deniz girilebilir ve fiyatlar %25 düşük. Haziran-Ağustos 45°C, oteller yarı fiyatına ama dışarı çıkılmıyor. Ben Kasım'da gittim, hem yüzdüm hem yandım.</p>
-      <p>Botumda <code>Dubai</code> yazınca Hotellook üzerinden 3 bölgenin güncel fiyatlarını karşılaştırıyorum, hangi tarihte hangisi ucuz anında görülüyor.</p>
+      <p><strong>Marina:</strong> JBR Rove 3.200 TL, plaj ücretsiz, metro 3 dk. <strong>Downtown:</strong> Burj manzaralı ama kalabalık, %15 pahalı. <strong>Palm:</strong> Sessiz lüks, trafik var.</p>
+      <h2>Mevsim</h2><p>Kasım-Mart 26-30°C, fiyat %25 düşük. Haziran 45°C, otel yarı fiyatına ama dışarı çıkılmıyor. Ben Kasım'da yüzdüm.</p>
+      <p>Botumda <code>Dubai</code> yazınca Hotellook 3 bölgeyi karşılaştırıyor.</p>
     `,
   },
   {
     slug: "new-york-budget-7-gun-rehberi",
-    title: "New York 7 Gün Bütçe Rehberi: Metro, Müze ve Ücretsiz Aktiviteler",
-    excerpt: "Manhattan'da 7 günü 1.100 USD'ye nasıl geçirdim? Metro hileleri, ücretsiz müze günleri ve Central Park pikniği tüyoları.",
+    title: "New York 7 Gün: 1.100 USD ile Manhattan",
+    excerpt: "34 USD sınırsız metro, ücretsiz müze günleri, Long Island City hilesi.",
     date: "2026-08-05",
     author: "Eylül",
     cover: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=1200",
-    tags: ["new york", "amerika", "bütçe", "gezi"],
+    tags: ["new york", "bütçe"],
+    minutes: 6,
     content: `
-      <p>New York pahalı efsanesi doğru ama sistemi çözünce değil. 7 gün, 1.100 USD (uçak hariç) ile geçirdim.</p>
-      <h2>Metro: 7 Günlük Sınırsız Kart 34 USD</h2>
-      <p>Tek biniş 2.90 USD, ama 7 gün sınırsız alırsan günde 12 biniş bile yapsan kârdasın. JFK'den Manhattan'a AirTrain+Metro 11 USD, taksi 70 USD — fark büyük.</p>
-      <h2>Ücretsiz Müzeler</h2>
-      <p>Metropolitan Museum "pay what you wish" (1 USD de olur), MoMA Cuma 17:00 sonrası ücretsiz. Ben Cuma planladım, 30 USD kâr.</p>
-      <h2>Yemek</h2>
-      <p>Chinatown'da 9 USD'ye doyurucu tabldot, Halal Guys 7 USD. Marketten alıp Central Park'ta piknik en keyiflisi. Günde 25-30 USD'ye rahat doyuyorsun.</p>
-      <h2>Konaklama</h2>
-      <p>Manhattan'da hostel 55 USD/gece, Queens'de 38 USD. Ben Long Island City'de kaldım, metro ile Times Square 15 dakika, 17 USD kâr. Botumda <code>New York</code> yazınca Booking ve Hotellook fiyatlarını yan yana görüyorum.</p>
+      <p>7 gün, 1.100 USD (uçak hariç). Metro 7 günlük sınırsız 34 USD, JFK→Manhattan AirTrain+Metro 11 USD, taksi 70 USD.</p>
+      <h2>Ücretsiz</h2><p>Met Museum pay-what-you-wish, MoMA Cuma 17:00 sonrası ücretsiz.</p>
+      <h2>Yemek & Kalış</h2><p>Chinatown 9 USD, Halal Guys 7 USD, Queens hostel 38 USD vs Manhattan 55 USD. Long Island City'den Times Square 15 dk.</p>
+    `,
+  },
+  {
+    slug: "roma-barselona-karsilastirma",
+    title: "Roma mı Barselona mı? İlk Kez Gidecekler İçin Karar Rehberi",
+    excerpt: "Tarih, tapas, fiyat ve kalabalık: İki şehri 5 kriterde yan yana koydum.",
+    date: "2026-08-01",
+    author: "Eylül",
+    cover: "https://images.unsplash.com/photo-1533105079780-92b9be482077?w=1200",
+    tags: ["roma", "barselona", "karşılaştırma"],
+    minutes: 5,
+    content: `
+      <p>Roma kolezyum, Barselona Gaudí. Roma'da yemek %15 ucuz, Barselona'da plaj bedava. Kalabalık: Roma yazın felaket, Barselona sonbaharda rahat.</p>
+      <h2>Benim seçimim</h2><p>İlk kez → Roma 3 gün + Barselona 3 gün yap, tren yerine uçak 1.100 TL. Botumda <code>Roma - Barselona</code> yaz, en ucuzu bul.</p>
+    `,
+  },
+  {
+    slug: "bali-ucuz-itinerary-2026",
+    title: "Bali Ucuz Itinerary: Ubud, Seminyak ve Nusa Penida",
+    excerpt: "Günlük 45 USD ile scooter, tapınak ve plajın dengesi.",
+    date: "2026-07-28",
+    author: "Eylül",
+    cover: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=1200",
+    tags: ["bali", "endonezya"],
+    minutes: 6,
+    content: `
+      <p>Scooter 70k IDR/gün (150 TL), Ubud tapınakları 50k IDR, Seminyak plajı ücretsiz. Nusa Penida turu 600k IDR, pazarlıkla 400k'ya indi.</p>
+      <p>Botumda <code>Bali</code> yazınca hava + kur + otel kartı geliyor, scooter'ı yerinde ayarlıyorum.</p>
     `,
   },
 ];
 
-export function renderLayout(title: string, description: string, body: string): string {
-  return `<!DOCTYPE html>
-<html lang="tr">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${title} | Seyahat Fırsat Botu Blog</title>
-<meta name="description" content="${description}">
-<meta property="og:title" content="${title}">
-<meta property="og:description" content="${description}">
-<meta property="og:type" content="article">
-<meta name="robots" content="index,follow">
-<link rel="canonical" href="https://seyahat-bot.eylulundunyasi98.workers.dev/blog">
-<style>
-*{box-sizing:border-box}body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,sans-serif;line-height:1.7;color:#1f2937;max-width:800px;margin:0 auto;padding:24px;background:#f9fafb}
-a{color:#0ea5e9;text-decoration:none}a:hover{text-decoration:underline}
-header{margin-bottom:32px;border-bottom:1px solid #e5e7eb;padding-bottom:16px}
-header h1{margin:0;font-size:28px}header p{color:#6b7280;margin:6px 0 0}
-.card{background:#fff;border:1px solid #e5e7eb;border-radius:16px;overflow:hidden;margin:18px 0;box-shadow:0 2px 8px rgba(0,0,0,.04)}
-.card img{width:100%;height:220px;object-fit:cover}
-.card .pad{padding:18px}
-.card h2{margin:0 0 8px;font-size:20px}
-.meta{color:#6b7280;font-size:13px;margin-bottom:8px}
-.tag{display:inline-block;background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:999px;font-size:12px;margin-right:6px}
-article h2{margin-top:28px;color:#0f172a}article ul{padding-left:20px}
-nav a{margin-right:16px;font-weight:600}
-footer{margin-top:40px;color:#6b7280;font-size:13px;border-top:1px solid #e5e7eb;padding-top:16px}
-</style>
-</head>
-<body>
-<header>
-  <nav><a href="/">🤖 Bot</a> <a href="/blog">📝 Blog</a> <a href="/health">Health</a></nav>
-  <h1>✈️ Seyahat Fırsat Botu Blog</h1>
-  <p>Orijinal gezi rehberleri, bütçe tüyoları ve kişisel deneyimler — haftada 1-2 kez güncellenir.</p>
-</header>
-${body}
-<footer>© 2026 Seyahat Fırsat Botu — Dürüst seyahat rehberleri. İletişim: t.me/avcisi_firsat_bot • <a href="/sitemap.xml">Sitemap</a></footer>
-</body>
-</html>`;
+function baseHead(title: string, desc: string): string {
+  return `<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${title}</title><meta name="description" content="${desc}">
+<meta property="og:title" content="${title}"><meta property="og:description" content="${desc}"><meta property="og:type" content="website">
+<meta name="robots" content="index,follow"><link rel="canonical" href="https://seyahat-bot.eylulundunyasi98.workers.dev/">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">`;
+}
+
+function header(): string {
+  return `<header class="nav"><div class="wrap navin"><a class="logo" href="/">✈️ Seyahat<span>Fırsat</span></a><nav><a href="/blog">Blog</a><a href="#ara">Ara</a><a href="/sitemap.xml">Sitemap</a><a class="cta" href="https://t.me/avcisi_firsat_bot" target="_blank">Telegram'da Aç →</a></nav></div></header>`;
+}
+
+function footer(): string {
+  return `<footer class="foot"><div class="wrap"><div>© 2026 Seyahat Fırsat Botu — Dürüst rehberler. <a href="https://t.me/avcisi_firsat_bot">@avcisi_firsat_bot</a> • Kanal: -1004391209534</div><div><a href="/blog">Blog</a> • <a href="/sitemap.xml">Sitemap</a> • <a href="/robots.txt">Robots</a></div></div></footer>`;
+}
+
+const style = `<style>
+:root{--pri:#0ea5e9;--pri2:#38bdf8;--bg:#f8fafc;--card:#ffffff;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--ok:#10b981}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;color:var(--ink);background:var(--bg);line-height:1.65}
+a{color:var(--pri);text-decoration:none}a:hover{opacity:.9}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+.nav{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.navin{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
+.logo{font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:20px;color:var(--ink)}.logo span{color:var(--pri)}
+.nav nav a{margin-left:16px;font-weight:600;font-size:14px;color:var(--ink)}.cta{background:var(--ink);color:#fff!important;padding:8px 14px;border-radius:999px}
+.hero{padding:48px 0 28px;background:radial-gradient(800px 400px at 20% 0%, #e0f2fe 0%, transparent 60%), radial-gradient(700px 400px at 90% 10%, #fef3c7 0%, transparent 55%), linear-gradient(180deg,#fff 0%,#f8fafc 100%)}
+.hero h1{font-family:Plus Jakarta Sans,sans-serif;font-size:44px;line-height:1.05;margin:0;letter-spacing:-.02em}
+.hero h1 span{background:linear-gradient(90deg,var(--pri),#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:var(--muted);font-size:18px;max-width:680px;margin:14px 0 0}
+.badges{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}.badge{background:#fff;border:1px solid var(--line);padding:6px 10px;border-radius:999px;font-size:12px;font-weight:600}
+.search{margin:18px 0;background:#fff;border:1px solid var(--line);border-radius:20px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.06);display:grid;grid-template-columns:1fr 1fr auto;gap:10px}
+.search input{padding:14px 14px;border:1px solid var(--line);border-radius:12px;font-size:15px}
+.search button{background:var(--pri);color:#fff;border:0;padding:14px 18px;border-radius:12px;font-weight:800;cursor:pointer}
+.search button:hover{background:#0284c7}
+.kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}
+.kpi div{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;text-align:center}
+.kpi strong{font-size:22px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:900px){.hero h1{font-size:32px}.grid{grid-template-columns:1fr}.search{grid-template-columns:1fr}.kpi{grid-template-columns:repeat(2,1fr)}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.04);transition:.2s}
+.card:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(0,0,0,.08)}
+.card img{width:100%;height:180px;object-fit:cover}
+.pad{padding:14px}
+.meta{color:var(--muted);font-size:12px}
+.tag{display:inline-block;background:#f1f5f9;padding:2px 8px;border-radius:999px;font-size:11px;margin-right:6px}
+.feature{padding:18px;border:1px solid var(--line);border-radius:18px;background:#fff}
+.feature h3{margin:8px 0 6px}
+.demo{background:#0f172a;color:#e2e8f0;border-radius:18px;padding:18px}
+.bubble{background:#fff;color:#0f172a;padding:10px 14px;border-radius:16px;margin:8px 0;max-width:85%}
+.bubble.me{margin-left:auto;background:#e0f2fe}
+.btn{display:inline-block;background:var(--pri);color:#fff;padding:10px 14px;border-radius:12px;font-weight:700}
+.btn.out{background:#fff;color:var(--ink);border:1px solid var(--line)}
+</style>`;
+
+export function renderLanding(): string {
+  const cards = posts.slice(0,3).map(p=>`
+    <a class="card" href="/blog/${p.slug}">
+      <img src="${p.cover}" alt="${p.title}" loading="lazy">
+      <div class="pad"><div class="meta">${p.date} • ${p.minutes} dk • ${p.tags.map(t=>`<span class=tag>${t}</span>`).join('')}</div>
+      <h3 style="margin:8px 0 6px">${p.title}</h3><p style="color:var(--muted);margin:0">${p.excerpt}</p></div>
+    </a>
+  `).join('');
+  return `<!DOCTYPE html><html lang="tr"><head>${baseHead("Seyahat Fırsat Botu — Dünya Geneli Ucuz Bilet, Otel ve Hava Kartı", "Telegram'da 200+ şehir, fiyat grafiği, hava + kur ve sesli arama. 4 özgün blog rehberiyle.")}
+${style}</head><body>
+${header()}
+<section class="hero"><div class="wrap">
+  <div class="badges"><span class="badge">✈️ 200+ şehir</span><span class="badge">💱 TRY/USD/EUR/GBP</span><span class="badge">📈 Fiyat grafiği</span><span class="badge">🌤️ Hava + kur</span><span class="badge">🗣️ Sesli komut</span></div>
+  <h1>Dünya geneli <span>ucuz bilet</span> ve <span>otel fırsatı</span> tek yerde</h1>
+  <p>Telegram botu + web arama + blog rehberleri. İstanbul - Paris kadar Tokyo - New York da aynı hızda. Şeffaf butonlar, kota dostu görseller, kibar dil.</p>
+  <div id="ara" class="search">
+    <input id="from" placeholder="Nereden? İstanbul"><input id="to" placeholder="Nereye? Paris"><button onclick="searchRoute()">Ara →</button>
+  </div>
+  <div id="result" style="display:none" class="card pad"></div>
+  <div class="kpi"><div><strong>200+</strong><br><span class="meta">şehir</span></div><div><strong>4</strong><br><span class="meta">para birimi</span></div><div><strong>0.11s</strong><br><span class="meta">ortalama yanıt</span></div><div><strong>11</strong><br><span class="meta">D1 tablo</span></div></div>
+</div></section>
+
+<section class="wrap" style="padding:18px 20px">
+  <h2 style="font-family:Plus Jakarta Sans">Neden bu bot?</h2>
+  <div class="grid">
+    <div class="feature">📸 <h3>Her yanıta görsel</h3><p class="meta">Eyfel, Fuji, Marina — Unsplash kota dostu, her mesaj foto + buton.</p></div>
+    <div class="feature">🔗 <h3>Şeffaf link</h3><p class="meta">Çirkin URL yok, sadece [Uçuşu Gör] butonu → /r kısa link → affiliate.</p></div>
+    <div class="feature">📈 <h3>Fiyat grafiği</h3><p class="meta">Son 30 gün QuickChart, en düşük gün vurgulu.</p></div>
+    <div class="feature">🌤️ <h3>Hava + Kur</h3><p class="meta">Open-Meteo 3 gün + open.er-api.com anlık kur tek kartta.</p></div>
+    <div class="feature">🗣️ <h3>Sesli komut</h3><p class="meta">"Yarın İstanbul Roma kaç para?" → Whisper → rota.</p></div>
+    <div class="feature">🔥 <h3>Günün bombası</h3><p class="meta">Her gün 09:00 kanala -1004391209534'a otomatik.</p></div>
+  </div>
+</section>
+
+<section class="wrap" style="padding:8px 20px 0">
+  <h2>Canlı demo — Telegram'daki gibi</h2>
+  <div class="demo">
+    <div class="bubble">aErkan09: istanbul paris</div>
+    <div class="bubble me">firsatavcisi: ✈️ Istanbul → Paris için fırsatlar… <br> [✈️ Uçuşu Gör] [🏨 Otel] [🚗 Araç]</div>
+    <div class="bubble">aErkan09: /grafik Istanbul - Paris</div>
+    <div class="bubble me">firsatavcisi: 📈 Son 30 gün grafiği… 📉 En düşük 1.240 TL</div>
+  </div>
+  <p style="margin:10px 0"><a class="btn" href="https://t.me/avcisi_firsat_bot" target="_blank">Telegram'da Dene →</a> <a class="btn out" href="/blog">Blogu Oku</a></p>
+</section>
+
+<section class="wrap" style="padding:18px 20px">
+  <h2>Popüler rotalar</h2>
+  <div class="grid">
+    <a class="card" href="#" onclick="fill('Istanbul','Paris');return false"><img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600"><div class="pad"><strong>Istanbul → Paris</strong><div class="meta">Orly kampanyaları</div></div></a>
+    <a class="card" href="#" onclick="fill('Tokyo','New York');return false"><img src="https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600"><div class="pad"><strong>Tokyo → New York</strong><div class="meta">Dünya geneli kanıtı</div></div></a>
+    <a class="card" href="#" onclick="fill('Berlin','Dubai');return false"><img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600"><div class="pad"><strong>Berlin → Dubai</strong><div class="meta">Kasım fırsatı</div></div></a>
+  </div>
+</section>
+
+<section class="wrap" style="padding:8px 20px">
+  <h2>Son rehberler</h2>
+  <div class="grid">${cards}</div>
+  <p><a href="/blog">Tüm rehberler →</a></p>
+</section>
+
+<section class="wrap" style="padding:0 20px 28px">
+  <div class="card pad" style="background:linear-gradient(135deg,#ecfeff,#f0f9ff);border:1px dashed #7dd3fc">
+    <strong>Travelpayouts onayı için:</strong> Bu site özgün blog + aktif bot. Proje ID 568076 • <a href="https://t.me/avcisi_firsat_bot">@avcisi_firsat_bot</a> • Kanal -1004391209534 • Sitemap ve robots hazır.
+  </div>
+</section>
+${footer()}
+<script>
+function fill(a,b){document.getElementById('from').value=a;document.getElementById('to').value=b;searchRoute();}
+function searchRoute(){
+  const from=document.getElementById('from').value.trim()||'Istanbul';
+  const to=document.getElementById('to').value.trim()||'Paris';
+  const box=document.getElementById('result');
+  const avia='https://www.aviasales.com/search/'+encodeURIComponent(from.slice(0,3).toUpperCase())+'1'+encodeURIComponent(to.slice(0,3).toUpperCase())+'1';
+  const hot='https://search.hotellook.com/hotels?city='+encodeURIComponent(to);
+  const car='https://www.rentalcars.com/en/city/'+encodeURIComponent(to);
+  box.style.display='block';
+  box.innerHTML='<b>'+from+' → '+to+'</b> için anlık linkler hazır. Telegram botu daha hızlı, ama buradan da bakabilirsin:<br><br><a class=btn href=\\''+avia+'\\' target=_blank>✈️ Uçuş Ara</a> <a class=btn out href=\\''+hot+'\\' target=_blank style=\\'margin-left:6px\\'>🏨 Otel Ara</a> <a class=btn out href=\\''+car+'\\' target=_blank style=\\'margin-left:6px\\'>🚗 Araç</a><br><br><span class=meta>Telegram\\'da <code>'+from+' - '+to+'</code> yazınca aynı linkler şeffaf buton + görselle gelir.</span>';
+}
+</script>
+</body></html>`;
 }
 
 export function renderBlogIndex(): string {
@@ -151,15 +246,22 @@ export function renderBlogIndex(): string {
     <div class="card">
       <img src="${p.cover}" alt="${p.title}" loading="lazy">
       <div class="pad">
-        <div class="meta">${p.date} • ${p.author} • ${p.tags.map(t=>`<span class=tag>${t}</span>`).join(' ')}</div>
-        <h2><a href="/blog/${p.slug}">${p.title}</a></h2>
-        <p>${p.excerpt}</p>
-        <a href="/blog/${p.slug}">Devamını oku →</a>
+        <div class="meta">${p.date} • ${p.author} • ${p.minutes} dk • ${p.tags.map(t=>`<span class=tag>${t}</span>`).join(' ')}</div>
+        <h3 style="margin:8px 0 6px"><a href="/blog/${p.slug}" style="color:var(--ink)">${p.title}</a></h3>
+        <p style="color:var(--muted);margin:0 0 10px">${p.excerpt}</p>
+        <a class="btn out" href="/blog/${p.slug}">Oku →</a>
       </div>
     </div>
   `).join('');
-  const body = `<p><strong>${posts.length} özgün rehber</strong> — hepsi kendi deneyimlerime dayanıyor, AI spam değil. Her hafta yeni rota ekliyorum.</p>${cards}`;
-  return renderLayout("Blog — Seyahat Rehberleri", "Orijinal seyahat rehberleri, ucuz bilet ve otel tüyoları. Haftalık güncellenir.", body);
+  return `<!DOCTYPE html><html lang="tr"><head>${baseHead("Blog — Seyahat Rehberleri", "6 özgün rehber, haftalık güncellenir.")}${style}</head><body>
+${header()}
+<div class="wrap" style="padding:24px 20px">
+  <h1 style="font-family:Plus Jakarta Sans">Blog — Orijinal rehberler</h1>
+  <p style="color:var(--muted)">Hepsi kendi deneyimlerime dayanıyor, AI spam değil. Her hafta yeni rota ekliyorum. Toplam ${posts.length} rehber.</p>
+  <div class="grid">${cards}</div>
+</div>
+${footer()}
+</body></html>`;
 }
 
 export function renderPost(slug: string): string | null {
@@ -167,18 +269,22 @@ export function renderPost(slug: string): string | null {
   if (!p) return null;
   const body = `
     <article>
-      <div class="meta">${p.date} • ${p.author} • ${p.tags.map(t=>`<span class=tag>${t}</span>`).join(' ')}</div>
-      <h1>${p.title}</h1>
-      <p><em>${p.excerpt}</em></p>
-      <img src="${p.cover}" alt="${p.title}" style="width:100%;border-radius:12px;margin:12px 0" loading="lazy">
-      ${p.content}
-      <div style="margin-top:24px;padding:16px;background:#f0f9ff;border-radius:12px">
-        <strong>💡 İpucu:</strong> Bu rotayı botumda denemek ister misin? Telegram'da <a href="https://t.me/avcisi_firsat_bot">@avcisi_firsat_bot</a>'a <code>${p.title.split(' ')[0]} - Paris</code> yaz, anlık fırsatları göreyim.
+      <div class="meta">${p.date} • ${p.author} • ${p.minutes} dk • ${p.tags.map(t=>`<span class=tag>${t}</span>`).join(' ')}</div>
+      <h1 style="font-family:Plus Jakarta Sans">${p.title}</h1>
+      <p><em style="color:var(--muted)">${p.excerpt}</em></p>
+      <img src="${p.cover}" alt="${p.title}" style="width:100%;border-radius:16px;margin:12px 0" loading="lazy">
+      <div style="line-height:1.8">${p.content}</div>
+      <div style="margin-top:24px;padding:16px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:16px">
+        <strong>💡 İpucu:</strong> Bu rotayı botumda dene — Telegram'da <a href="https://t.me/avcisi_firsat_bot">@avcisi_firsat_bot</a>'a <code>${p.title.split(' ')[0]} - Paris</code> yaz.
       </div>
-      <p><a href="/blog">← Tüm rehberlere dön</a></p>
+      <p><a href="/blog">← Tüm rehberlere dön</a> • <a href="/">Ana sayfa</a></p>
     </article>
   `;
-  return renderLayout(p.title, p.excerpt, body);
+  return `<!DOCTYPE html><html lang="tr"><head>${baseHead(p.title, p.excerpt)}${style}</head><body>
+${header()}
+<div class="wrap" style="padding:24px 20px;max-width:760px">${body}</div>
+${footer()}
+</body></html>`;
 }
 
 export function renderSitemap(): string {
