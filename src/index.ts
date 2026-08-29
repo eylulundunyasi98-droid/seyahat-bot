@@ -41,8 +41,23 @@ export default {
       if (url.pathname === '/health') {
         return new Response(JSON.stringify({ ok: true, worker: 'seyahat-bot', time: new Date().toISOString() }), { headers: { 'Content-Type': 'application/json', ...secHeaders } });
       }
-      if (url.pathname === '/') {
-        return new Response('✈️ Global Seyahat Botu çalışıyor! Webhook: POST /', { headers: { 'Content-Type': 'text/plain; charset=utf-8', ...secHeaders } });
+      if (url.pathname === '/' || url.pathname === '/blog' || url.pathname === '/blog/') {
+        const { renderBlogIndex } = await import('./blog');
+        return new Response(renderBlogIndex(), { headers: { 'Content-Type': 'text/html; charset=utf-8', ...secHeaders } });
+      }
+      if (url.pathname.startsWith('/blog/')) {
+        const slug = url.pathname.replace('/blog/', '').replace(/\/$/, '');
+        const { renderPost } = await import('./blog');
+        const html = renderPost(slug);
+        if (html) return new Response(html, { headers: { 'Content-Type': 'text/html; charset=utf-8', ...secHeaders } });
+        return new Response('Yazı bulunamadı', { status: 404, headers: { 'Content-Type': 'text/plain; charset=utf-8', ...secHeaders } });
+      }
+      if (url.pathname === '/sitemap.xml') {
+        const { renderSitemap } = await import('./blog');
+        return new Response(renderSitemap(), { headers: { 'Content-Type': 'application/xml', ...secHeaders } });
+      }
+      if (url.pathname === '/robots.txt') {
+        return new Response(`User-agent: *\nAllow: /\nSitemap: https://seyahat-bot.eylulundunyasi98.workers.dev/sitemap.xml`, { headers: { 'Content-Type': 'text/plain', ...secHeaders } });
       }
       if (url.pathname === '/cron' && request.headers.get('Authorization') === `Bearer ${env.TELEGRAM_BOT_TOKEN}`) {
         const { checkPriceAlerts, sendDailyDigest } = await import('./cron');
