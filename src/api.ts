@@ -12,6 +12,7 @@ const EXCHANGE_RATE_API = 'https://open.er-api.com/v6/latest';
 const CITY_CODES: Record<string, string> = {
   'istanbul': 'IST', 'ankara': 'ESB', 'izmir': 'ADB', 'antalya': 'AYT', 'bodrum': 'BJV',
   'dalaman': 'DLM', 'trabzon': 'TZX', 'adana': 'ADA', 'gaziantep': 'GZT', 'kayseri': 'ASR',
+  'aydin': 'ADB', 'mugla': 'DLM', 'denizli': 'DNZ', 'manisa': 'ADB', 'balikesir': 'EDO', 'bursa': 'YEI', 'eskisehir': 'AOE', 'konya': 'KYA', 'samsun': 'SSX', 'malatya': 'MLX', 'erzurum': 'ERZ', 'diyarbakir': 'DIY', 'sanliurfa': 'SFQ', 'mardin': 'MQM', 'van': 'VAN', 'elazig': 'EZS', 'sivas': 'VAS', 'hatay': 'HTY', 'mersin': 'ADA', 'alanya': 'GZP', 'afyon': 'AFY', 'kutahya': 'KUT', 'corum': 'ESB', 'tokat': 'TJK', 'ordu': 'OGU', 'giresun': 'TZX', 'rize': 'TZX', 'artvin': 'TZX', 'kars': 'KYS', 'agri': 'AJI', 'mus': 'MSR', 'bitlis': 'VAN', 'siirt': 'SXZ', 'batman': 'BAL', 'sirnak': 'NKT', 'hakkari': 'YKO',
   'paris': 'PAR', 'lyon': 'LYS', 'nice': 'NCE', 'marseille': 'MRS', 'toulouse': 'TLS',
   'london': 'LON', 'manchester': 'MAN', 'edinburgh': 'EDI', 'birmingham': 'BHX', 'glasgow': 'GLA',
   'new york': 'NYC', 'los angeles': 'LAX', 'chicago': 'CHI', 'miami': 'MIA', 'san francisco': 'SFO',
