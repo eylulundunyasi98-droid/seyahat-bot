@@ -1,5 +1,6 @@
-// src/blog.ts - Fancy site + blog (Travelpayouts onayı + dönüşüm) - 90 rehber
+// src/blog.ts - Fancy site + blog (Travelpayouts onayı + dönüşüm) - 90 rehber + marketplace
 import { extraCities } from "./blog_extra";
+import { serviceCategories, partnerGroups, partnerCount, marketplaceBundles } from "./marketplace-data";
 export interface Post {
   slug: string;
   title: string;
@@ -253,6 +254,30 @@ ${header()}
     <div class="feature"><img src="https://images.unsplash.com/photo-1530908295418-a12e326966ba?w=400" style="width:100%;height:120px;object-fit:cover;border-radius:12px"><h3>🌤️ Mevsim tüyoları</h3><p class="meta">En ucuz ay, hava durumu, kalabalık analizi.</p></div>
     <div class="feature"><img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400" style="width:100%;height:120px;object-fit:cover;border-radius:12px"><h3>✍️ Kişisel deneyim</h3><p class="meta">4 kez Paris, 7 gece Dubai — hepsi deneyim.</p></div>
     <div class="feature"><img src="https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=400" style="width:100%;height:120px;object-fit:cover;border-radius:12px"><h3>🔄 Haftalık güncelleme</h3><p class="meta">Fiyatlar ve rotalar düzenli yenilenir.</p></div>
+  </div>
+</section>
+
+<section class="wrap" style="padding:8px 20px">
+  <h2>12 hizmet kategorisi — tek arama</h2>
+  <p style="color:var(--muted)">Uçaktan otele, trenden eSIM'e kadar tüm seyahat ihtiyaçların tek yerde.</p>
+  <div class="grid">
+    ${serviceCategories.map(s=>`<div class="feature"><h3>${s.name}</h3><p class="meta">${s.description}</p><small style="color:var(--muted)">${partnerGroups[s.slug]?.length || 0} sağlayıcı</small></div>`).join('')}
+  </div>
+</section>
+
+<section class="wrap" style="padding:8px 20px">
+  <h2>90+ marka — tek çatı</h2>
+  <p style="color:var(--muted)">${partnerCount}+ seyahat markası karşılaştırılabilir. Aktif ortaklıklar yönetim panelinden yönetilir.</p>
+  <div style="display:flex;flex-wrap:wrap;gap:8px">
+    ${Object.values(partnerGroups).flat().slice(0,32).map(p=>`<span class="badge">${p}</span>`).join('')}
+  </div>
+  <p style="margin-top:10px"><a class="btn out" href="/partners">Tüm markalar →</a></p>
+</section>
+
+<section class="wrap" style="padding:8px 20px">
+  <h2>Birlikte daha avantajlı paketler</h2>
+  <div class="grid">
+    ${marketplaceBundles.map(b=>`<div class="card"><img src="${b.image}" alt="${b.city}" loading="lazy" style="height:160px"><div class="pad"><small style="color:var(--muted)">TAM YOLCULUK • ${b.code}</small><h3>İstanbul → ${b.city}</h3><ul style="padding-left:16px;margin:8px 0">${b.items.map(i=>`<li style="font-size:13px">${i}</li>`).join('')}</ul><div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px"><span><small style="color:var(--muted)">toplam başlangıç</small><br><strong>${b.total}</strong> <span style="background:#fef3c7;padding:2px 6px;border-radius:6px;font-size:11px">${b.saving}</span></span><a class="btn" href="/search?q=${encodeURIComponent(`İstanbul - ${b.city}`)}">Paketi incele</a></div></div></div>`).join('')}
   </div>
 </section>
 
