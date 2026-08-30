@@ -160,7 +160,7 @@ export async function handleMessage(message: any, env: Env): Promise<void> {
       const [f, tt] = r.split(' - ');
       const price = Math.floor(700 + Math.random()*800);
       const [fl, hl, cl, al, photo] = await Promise.all([searchFlights(env,f,tt,currency), getHotelLink(env,tt,currency), getCarLink(env,tt,currency), getActivitiesLink(env,tt,currency), getDestinationImage(tt)]);
-      const cap = `🔥 <b>KAMPANYA!</b> ${f} → ${tt}\n💰 Sadece <b>${price} ${currency}</b> <s>${Math.round(price*1.4)} ${currency}</s> %30 indirim!\n⏳ Bugün 23:59'a kadar — beyin fırtınası: Hemen tıkla, kaçırma!`;
+      const cap = `🔥 <b>KAMPANYA!</b> ${f} → ${tt}\n💰 Sadece <b>${price} ${currency}</b> <s>${Math.round(price*1.4)} ${currency}</s> %30 indirim!\n⏳ Bugün 23:59'a kadar geçerli`;
       const kb = createTravelKeyboard(fl, hl, cl, al, await getTrainLink(env,f,tt), await getBusLink(env,f,tt));
       await sendPhoto(env, chatId, photo, cap, kb);
       return;
