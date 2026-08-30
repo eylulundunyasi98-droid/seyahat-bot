@@ -1,7 +1,7 @@
 // src/cron.ts - Zamanlanmış görevler + UI + güvenlik
 import { Env } from './index';
 import { CHANNEL_ID, GLOBAL_TRENDING_ROUTES } from './constants';
-import { searchFlights, getHotelLink, getCarLink, getActivitiesLink, getDestinationImage, getCityCode } from './api';
+import { searchFlights, getHotelLink, getCarLink, getActivitiesLink, getTrainLink, getBusLink, getDestinationImage, getCityCode } from './api';
 import { sendPhoto, sendToChannel, createTravelKeyboard, createSingleButtonKeyboard } from './telegram';
 import * as UI from './ui';
 import * as DB from './db';
@@ -82,30 +82,58 @@ export async function saveHistoryForFavorites(env: Env): Promise<void> {
 
 export async function sendDailyDigest(env: Env): Promise<void> {
   try {
-    // Günün bombasını seç (rastgele ama sabit seed ile gün bazlı)
     const today = new Date().toISOString().slice(0, 10);
     const idx = Math.abs(hashCode(today)) % GLOBAL_TRENDING_ROUTES.length;
     const route = GLOBAL_TRENDING_ROUTES[idx];
     const [from, to] = route.split('-').map(s => s.trim());
     const currency = 'TRY';
     const price = mockPrice();
-    const [flightLink, hotelLink, carLink, activityLink, photo] = await Promise.all([
+    const [flightLink, hotelLink, carLink, activityLink, trainLink, busLink, photo] = await Promise.all([
       searchFlights(env, from, to, currency),
       getHotelLink(env, to, currency),
       getCarLink(env, to, currency),
       getActivitiesLink(env, to, currency),
+      getTrainLink(env, from, to),
+      getBusLink(env, from, to),
       getDestinationImage(to),
     ]);
-
     await DB.saveDailyCoupon(env, { route, price, currency, flightLink, hotelLink, carLink }).catch(() => {});
-
-    const caption = UI.dailyCaption(route, price, currency, today) + `\n\n🤖 Bot: @avcisi_firsat_bot`;
-    const kbBase = createTravelKeyboard(flightLink, hotelLink, carLink, activityLink);
+    const caption = UI.dailyCaption(route, price, currency, today);
+    const kbBase = createTravelKeyboard(flightLink, hotelLink, carLink, activityLink, trainLink, busLink);
     const kb = { inline_keyboard: [...(kbBase.inline_keyboard || []), [{ text: '🤖 Bot ile Ara', url: 'https://t.me/avcisi_firsat_bot?start=channel' }]] };
     await sendPhoto(env, CHANNEL_ID, photo, caption, kb);
   } catch (e) {
     console.error('dailyDigest', e);
   }
+}
+
+export async function sendCampaignDigest(env: Env): Promise<void> {
+  try {
+    // Kampanya: rastgele 1 rotada indirim etiketiyle kanala
+    const route = GLOBAL_TRENDING_ROUTES[Math.floor(Math.random() * GLOBAL_TRENDING_ROUTES.length)];
+    const [from, to] = route.split('-').map(s => s.trim());
+    const currency = 'TRY';
+    let price: number | null = null;
+    try {
+      const { searchFlightsDirect } = await import('./api');
+      const data: any = await searchFlightsDirect(env, from, to, currency);
+      price = data?.data?.[0]?.price ? Math.round(data.data[0].price * 0.85) : null;
+    } catch {}
+    const finalPrice = price || Math.floor(mockPrice() * 0.75);
+    const [flightLink, hotelLink, carLink, activityLink, trainLink, busLink, photo] = await Promise.all([
+      searchFlights(env, from, to, currency),
+      getHotelLink(env, to, currency),
+      getCarLink(env, to, currency),
+      getActivitiesLink(env, to, currency),
+      getTrainLink(env, from, to),
+      getBusLink(env, from, to),
+      getDestinationImage(to),
+    ]);
+    const caption = `🔥 <b>KAMPANYA!</b> ${from} → ${to}\n💰 Sadece <b>${finalPrice} ${currency}</b> <s>${Math.round(finalPrice*1.4)} ${currency}</s> %30 indirim!\n⏳ Bugün 23:59'a kadar`;
+    const kbBase = createTravelKeyboard(flightLink, hotelLink, carLink, activityLink, trainLink, busLink);
+    const kb = { inline_keyboard: [...(kbBase.inline_keyboard || []), [{ text: '🤖 Bot ile Ara', url: 'https://t.me/avcisi_firsat_bot?start=campaign' }]] };
+    await sendPhoto(env, CHANNEL_ID, photo, caption, kb);
+  } catch (e) { console.error('campaignDigest', e); }
 }
 
 function hashCode(str: string): number {
@@ -120,6 +148,8 @@ export async function handleScheduled(event: ScheduledEvent, env: Env, ctx: Exec
     ctx.waitUntil(Promise.all([checkPriceAlerts(env), saveHistoryForFavorites(env)]));
   } else if (event.cron === '0 9 * * *') {
     ctx.waitUntil(sendDailyDigest(env));
+  } else if (event.cron === '0 15 * * *') {
+    ctx.waitUntil(sendCampaignDigest(env));
   } else {
     ctx.waitUntil(checkPriceAlerts(env));
   }

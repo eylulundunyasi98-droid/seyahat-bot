@@ -82,6 +82,31 @@ const CITY_CODES: Record<string, string> = {
   'guney afrika': 'JNB', 'south africa': 'JNB',
 };
 
+export const COUNTRY_CITIES: Record<string, string[]> = {
+  'almanya': ['Berlin', 'Munich', 'Frankfurt'],
+  'germany': ['Berlin', 'Munich', 'Frankfurt'],
+  'fransa': ['Paris', 'Lyon', 'Nice'],
+  'france': ['Paris', 'Lyon', 'Nice'],
+  'italya': ['Rome', 'Milan', 'Venice'],
+  'italy': ['Rome', 'Milan', 'Venice'],
+  'ispanya': ['Madrid', 'Barcelona', 'Malaga'],
+  'spain': ['Madrid', 'Barcelona', 'Malaga'],
+  'ingiltere': ['London', 'Manchester', 'Edinburgh'],
+  'england': ['London', 'Manchester', 'Edinburgh'],
+  'turkiye': ['Istanbul', 'Ankara', 'Izmir'],
+  'turkey': ['Istanbul', 'Ankara', 'Izmir'],
+  'japonya': ['Tokyo', 'Osaka', 'Kyoto'],
+  'japan': ['Tokyo', 'Osaka', 'Kyoto'],
+  'amerika': ['New York', 'Los Angeles', 'Chicago'],
+  'usa': ['New York', 'Los Angeles', 'Chicago'],
+  'avustralya': ['Sydney', 'Melbourne', 'Brisbane'],
+  'australia': ['Sydney', 'Melbourne', 'Brisbane'],
+  'kanada': ['Toronto', 'Vancouver', 'Montreal'],
+  'canada': ['Toronto', 'Vancouver', 'Montreal'],
+  'brezilya': ['Sao Paulo', 'Rio de Janeiro', 'Brasilia'],
+  'brazil': ['Sao Paulo', 'Rio de Janeiro', 'Brasilia'],
+};
+
 const CITY_COORDS: Record<string, { lat: number; lon: number; name: string }> = {
   'istanbul': { lat: 41.0082, lon: 28.9784, name: 'İstanbul' },
   'ankara': { lat: 39.9334, lon: 32.8597, name: 'Ankara' },
@@ -174,6 +199,11 @@ export function getCityCoords(city: string): { lat: number; lon: number; name: s
   return CITY_COORDS[normalized] || null;
 }
 
+export function getCountryCities(country: string): string[] | null {
+  const normalized = normalizeCity(country);
+  return COUNTRY_CITIES[normalized] || null;
+}
+
 export function getAllCities(): string[] {
   return Object.keys(CITY_COORDS);
 }
@@ -254,6 +284,16 @@ export async function getCarLink(env: Env, city: string, currency: string = 'TRY
 export async function getActivitiesLink(env: Env, city: string, currency: string = 'TRY'): Promise<string> {
   const activitiesUrl = `https://www.klook.com/en-US/search/city-${encodeURIComponent(city.toLowerCase().replace(/\s+/g, '-'))}/?marker=${env.TRAVELPAYOUTS_MARKER || 'seyahat'}`;
   return await createAffiliateLink(env, activitiesUrl);
+}
+
+export async function getTrainLink(env: Env, from: string, to: string): Promise<string> {
+  const url = `https://www.thetrainline.com/en/search/${encodeURIComponent(from)}-${encodeURIComponent(to)}`;
+  return await createAffiliateLink(env, url);
+}
+
+export async function getBusLink(env: Env, from: string, to: string): Promise<string> {
+  const url = `https://www.flixbus.com/search?departureCity=${encodeURIComponent(from)}&arrivalCity=${encodeURIComponent(to)}`;
+  return await createAffiliateLink(env, url);
 }
 
 export async function getTrendingDestinations(env: Env, currency: string = 'TRY'): Promise<string[]> {

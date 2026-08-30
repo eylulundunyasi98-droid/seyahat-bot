@@ -251,17 +251,16 @@ export function createReplyKeyboard(buttons: ReplyKeyboardButton[][], resize = t
   return { keyboard: buttons, resize_keyboard: resize, one_time_keyboard: oneTime };
 }
 
-export function createTravelKeyboard(flightLink: string, hotelLink: string, carLink: string, activityLink?: string): ReplyMarkup {
+export function createTravelKeyboard(flightLink: string, hotelLink: string, carLink: string, activityLink?: string, trainLink?: string, busLink?: string): ReplyMarkup {
   const buttons: InlineKeyboardButton[][] = [
     [{ text: '✈️ Uçuş Fırsatı', url: flightLink }],
     [{ text: '🏨 Otel Fırsatı', url: hotelLink }],
     [{ text: '🚗 Araç Kiralama', url: carLink }],
   ];
-  if (activityLink) {
-    buttons.push([{ text: '🎯 Aktiviteler', url: activityLink }]);
-  }
+  if (activityLink) buttons.push([{ text: '🎯 Aktiviteler', url: activityLink }]);
+  if (trainLink) buttons.push([{ text: '🚆 Tren', url: trainLink }]);
+  if (busLink) buttons.push([{ text: '🚌 Otobüs', url: busLink }]);
   buttons.push([{ text: '📢 Arkadaşlara Gönder', switch_inline_query: '' }]);
-  // Şeffaf kanal butonu - her sorguda (normal kanal)
   buttons.push([{ text: '✈️ Kanalımız', url: 'https://t.me/+TKQphsxQyIRhYjBk' }]);
   return { inline_keyboard: buttons };
 }
@@ -276,22 +275,22 @@ export function withChannelButton(keyboard: ReplyMarkup): ReplyMarkup {
 }
 
 export function createMainMenuKeyboard(lang: string = 'tr'): ReplyMarkup {
-  // Sade kibar menü: 6 buton, 3 satır
+  // 9 buton, 3x3 eksiksiz menü
   const menus: Record<string, ReplyKeyboardButton[][]> = {
     tr: [
-      [{ text: '🧭 Rota Ara' }, { text: '🔥 Günün Bombası' }],
-      [{ text: '🌍 Keşfet' }, { text: '⭐ Takip Ettiklerim' }],
-      [{ text: '⚙️ Ayarlar' }, { text: 'ℹ️ Yardım' }],
+      [{ text: '🧭 Rota Ara' }, { text: '🔥 Günün Bombası' }, { text: '💰 Kampanyalar' }],
+      [{ text: '🌍 Keşfet' }, { text: '⭐ Takip Ettiklerim' }, { text: '📈 Fiyat Takibi' }],
+      [{ text: '⚙️ Ayarlar' }, { text: 'ℹ️ Yardım' }, { text: '🚆 Tren/🚌 Otobüs' }],
     ],
     en: [
-      [{ text: '🧭 Search Route' }, { text: '🔥 Today\'s Deal' }],
-      [{ text: '🌍 Explore' }, { text: '⭐ My Tracking' }],
-      [{ text: '⚙️ Settings' }, { text: 'ℹ️ Help' }],
+      [{ text: '🧭 Search Route' }, { text: '🔥 Today\'s Deal' }, { text: '💰 Deals' }],
+      [{ text: '🌍 Explore' }, { text: '⭐ My Tracking' }, { text: '📈 Price Alert' }],
+      [{ text: '⚙️ Settings' }, { text: 'ℹ️ Help' }, { text: '🚆 Train/🚌 Bus' }],
     ],
     de: [
-      [{ text: '🧭 Route Suchen' }, { text: '🔥 Tagesangebot' }],
-      [{ text: '🌍 Entdecken' }, { text: '⭐ Meine Routen' }],
-      [{ text: '⚙️ Einstellungen' }, { text: 'ℹ️ Hilfe' }],
+      [{ text: '🧭 Route Suchen' }, { text: '🔥 Tagesangebot' }, { text: '💰 Angebote' }],
+      [{ text: '🌍 Entdecken' }, { text: '⭐ Meine Routen' }, { text: '📈 Preisalarm' }],
+      [{ text: '⚙️ Einstellungen' }, { text: 'ℹ️ Hilfe' }, { text: '🚆 Zug/🚌 Bus' }],
     ],
   };
   return createReplyKeyboard(menus[lang] || menus.tr);

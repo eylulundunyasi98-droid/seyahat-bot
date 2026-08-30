@@ -20,9 +20,12 @@ import {
   getCityCode,
   getCityCoords,
   searchFlights,
+  searchFlightsDirect,
   getHotelLink,
   getCarLink,
   getActivitiesLink,
+  getTrainLink,
+  getBusLink,
   getTrendingDestinations,
   getCheapestDatesLink,
   getDestinationImage,
@@ -287,7 +290,6 @@ export async function handleMessage(message: any, env: Env): Promise<void> {
 
 async function handleMenuButtons(text: string, env: Env, chatId: number, lang: string, currency: string): Promise<boolean> {
   const t = text.trim();
-  // Esnek eşleşme - emoji varyantları ve boşluklara toleranslı
   if (t.includes('Rota Ara') || t.includes('Search Route') || t.includes('Route Suchen')) {
     await sendTelegram(env, chatId, lang === 'tr' ? `✈️ Rota yaz lütfen: <code>İstanbul - Paris</code> veya <code>New York - Tokyo</code>\nÖrnekleri kopyalayıp gönderebilirsin.` : `✈️ Type route`, createExploreKeyboard(lang));
     return true;
@@ -296,12 +298,31 @@ async function handleMenuButtons(text: string, env: Env, chatId: number, lang: s
     await handleDailyDeal(env, chatId, lang, currency);
     return true;
   }
+  if (t.includes('Kampanyalar') || t.includes('Deals') || t.includes('Angebote') || t.includes('Kampanya')) {
+    // Anlık kampanya göster
+    const r = ['Istanbul - Paris','Berlin - Barcelona','Tokyo - Bangkok','London - New York','Rome - Amsterdam'][Math.floor(Math.random()*5)];
+    const [f, tt] = r.split(' - ');
+    const price = Math.floor(700 + Math.random()*800);
+    const [fl, hl, cl, al, photo] = await Promise.all([searchFlights(env,f,tt,currency), getHotelLink(env,tt,currency), getCarLink(env,tt,currency), getActivitiesLink(env,tt,currency), getDestinationImage(tt)]);
+    const cap = `🔥 <b>KAMPANYA!</b> ${f} → ${tt}\n💰 Sadece <b>${price} ${currency}</b> <s>${Math.round(price*1.4)} ${currency}</s> %30 indirim!\n⏳ Bugün 23:59'a kadar`;
+    const kb = createTravelKeyboard(fl, hl, cl, al, await getTrainLink(env,f,tt), await getBusLink(env,f,tt));
+    await sendPhoto(env, chatId, photo, cap, kb);
+    return true;
+  }
   if (t.includes('Keşfet') || t.includes('Explore') || t.includes('Entdecken')) {
     await sendTelegram(env, chatId, lang === 'tr' ? `🌍 <b>Keşfet</b> — ne yapmak istersin?` : `🌍 Explore`, createExploreKeyboard(lang));
     return true;
   }
   if (t.includes('Takip Ettiklerim') || t.includes('My Tracking') || t.includes('Meine Routen') || t.includes('Takip')) {
     await handleFavorites(env, chatId, lang);
+    return true;
+  }
+  if (t.includes('Fiyat Takibi') || t.includes('Price Alert') || t.includes('Preisalarm')) {
+    await handleAlerts(env, chatId, lang);
+    return true;
+  }
+  if (t.includes('Tren') || t.includes('Otobüs') || t.includes('Train') || t.includes('Bus') || t.includes('Zug')) {
+    await sendTelegram(env, chatId, lang === 'tr' ? `🚆 <b>Tren & 🚌 Otobüs</b>\n\nRota yaz: <code>Istanbul - Ankara</code> veya <code>Berlin - Munich</code>\nSana tren ve otobüs butonlarını da göstereceğim. Örnek: <code>Ankara - Istanbul</code>` : `🚆 Train & 🚌 Bus — type route`);
     return true;
   }
   if (t.includes('Ayarlar') || t.includes('Settings') || t.includes('Einstellungen')) {
@@ -319,30 +340,66 @@ async function handleMenuButtons(text: string, env: Env, chatId: number, lang: s
 async function handleRouteSearch(env: Env, chatId: number, from: string, to: string, lang: string, currency: string): Promise<void> {
   try {
     await sendChatAction(env, chatId, 'upload_photo');
+    // Ülke ise 3 şehir öner
+    const { getCountryCities } = await import('./api');
+    const fromCities = getCountryCities(from);
+    const toCities = getCountryCities(to);
+    if (fromCities || toCities) {
+      const fromList = fromCities || [from];
+      const toList = toCities || [to];
+      const buttons: any[] = [];
+      for (const f of fromList.slice(0,2)) {
+        for (const t of toList.slice(0,3)) {
+          const route = `${f} - ${t}`;
+          buttons.push([{ text: `✈️ ${f} → ${t}`, callback_data: `route_${route.replace(/\s/g,'_')}` }]);
+          if (buttons.length >= 6) break;
+        }
+        if (buttons.length >= 6) break;
+      }
+      await sendTelegram(env, chatId, `🌍 <b>${from} → ${to}</b> için hangi şehir? Seç:` , createInlineKeyboard(buttons));
+      return;
+    }
     const fromCode = getCityCode(from);
     const toCode = getCityCode(to);
     if (fromCode === 'ANY' || toCode === 'ANY') {
       await sendTelegram(env, chatId, lang === 'tr' ? `⚠️ Şehirleri tam anlayamadım. Lütfen kibarca şöyle yaz: <code>İstanbul - Paris</code> veya <code>New York - Tokyo</code>` : `⚠️ City not found. Try <code>London - Paris</code>`);
       return;
     }
-    const [flightLink, hotelLink, carLink, activityLink, photoUrl, rate] = await Promise.all([
+    const [flightLink, hotelLink, carLink, activityLink, trainLink, busLink, photoUrl, rate] = await Promise.all([
       searchFlights(env, from, to, currency),
       getHotelLink(env, to, currency),
       getCarLink(env, to, currency),
       getActivitiesLink(env, to, currency),
+      getTrainLink(env, from, to),
+      getBusLink(env, from, to),
       getDestinationImage(to),
       getExchangeRate('EUR', currency === 'TRY' ? 'TRY' : currency),
     ]);
 
-    const demoPrice = Math.floor(1500 + Math.random() * 3000);
-    await DB.savePriceHistory(env, `${from} - ${to}`, demoPrice, currency).catch(() => {});
+    // Gerçek fiyat dene, olmazsa demo (free kota korumalı)
+    let priceText: string | undefined;
+    try {
+      const data: any = await searchFlightsDirect(env, from, to, currency);
+      const best = data?.data?.[0];
+      if (best?.price) {
+        const real = Math.round(best.price);
+        await DB.savePriceHistory(env, `${from} - ${to}`, real, currency).catch(()=>{});
+        const airline = best.airline ? ` • ${best.airline}` : '';
+        const date = best.departure_at ? ` • ${best.departure_at.slice(0,10)}` : '';
+        priceText = `💰 En ucuz: ${formatCurrency(real, currency, lang)}${airline}${date}`;
+      } else throw new Error('no price');
+    } catch {
+      const demoPrice = Math.floor(1500 + Math.random() * 3000);
+      priceText = `💰 Tahmini: ${formatCurrency(demoPrice, currency, lang)}`;
+      await DB.savePriceHistory(env, `${from} - ${to}`, demoPrice, currency).catch(() => {});
+    }
 
     const rateText = rate ? `💱 1 EUR ≈ ${rate.toFixed(2)} ${currency}` : undefined;
-    const caption = UI.routeCaption(from, to, currency, rateText);
-    const keyboard = createTravelKeyboard(flightLink, hotelLink, carLink, activityLink);
+    const caption = UI.routeCaption(from, to, currency, rateText) + (priceText ? `\n${priceText}` : '');
+    const keyboard = createTravelKeyboard(flightLink, hotelLink, carLink, activityLink, trainLink, busLink);
     const res = await sendPhoto(env, chatId, photoUrl, caption, keyboard);
     if (!res?.ok) {
-      await sendTelegram(env, chatId, `✈️ <b>${from} → ${to}</b> için fırsatlar hazır! Butonlardan incele:`, keyboard);
+      await sendTelegram(env, chatId, `✈️ <b>${from} → ${to}</b> için fırsatlar hazır! Butonlardan incele:\n${priceText || ''}`, keyboard);
     }
   } catch (e) {
     console.error('routeSearch', e);
@@ -548,6 +605,14 @@ export async function handleCallbackQuery(callbackQuery: any, env: Env): Promise
       const u = await DB.getUser(env, chatId);
       await answerCallbackQuery(env, cqId, `📊 Grafik hazırlanıyor`);
       await handlePriceChart(env, chatId, route, getLang(u), u?.currency || 'TRY');
+      return;
+    }
+    if (data.startsWith('route_')) {
+      const route = data.replace('route_', '').replace(/_/g, ' ').replace(' - ', ' - ');
+      const [f, t] = route.split(' - ').map(s=>s.trim());
+      const u = await DB.getUser(env, chatId);
+      await answerCallbackQuery(env, cqId, `✈️ ${f} → ${t}`);
+      await handleRouteSearch(env, chatId, f, t, getLang(u), u?.currency || 'TRY');
       return;
     }
     if (data.startsWith('explore_')) {
