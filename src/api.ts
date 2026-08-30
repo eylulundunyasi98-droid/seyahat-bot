@@ -81,6 +81,17 @@ const CITY_CODES: Record<string, string> = {
   'misir': 'CAI', 'egypt': 'CAI',
   'fas': 'CAS', 'morocco': 'CAS',
   'guney afrika': 'JNB', 'south africa': 'JNB',
+  'arjantin': 'BUE', 'argentina': 'BUE',
+  'sili': 'SCL', 'chile': 'SCL',
+  'peru': 'LIM',
+  'kolombiya': 'BOG', 'colombia': 'BOG',
+  'venezuela': 'CCS',
+  'uruguay': 'MVD',
+  'paraguay': 'ASU',
+  'ekvador': 'UIO', 'ecuador': 'UIO',
+  'bolivya': 'LPB', 'bolivia': 'LPB',
+  'panama': 'PTY',
+  'kosta rika': 'SJO', 'costa rica': 'SJO',
 };
 
 export const COUNTRY_CITIES: Record<string, string[]> = {

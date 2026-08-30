@@ -362,7 +362,11 @@ async function handleRouteSearch(env: Env, chatId: number, from: string, to: str
     const fromCode = getCityCode(from);
     const toCode = getCityCode(to);
     if (fromCode === 'ANY' || toCode === 'ANY') {
-      await sendTelegram(env, chatId, lang === 'tr' ? `⚠️ Şehirleri tam anlayamadım. Lütfen kibarca şöyle yaz: <code>İstanbul - Paris</code> veya <code>New York - Tokyo</code>` : `⚠️ City not found. Try <code>London - Paris</code>`);
+      const kb = createInlineKeyboard([
+        [{ text: '💰 Kampanyalar', callback_data: 'explore_trending' }, { text: '🌍 Trendler', callback_data: 'explore_trending' }],
+        [{ text: '✈️ Kanalımız', url: 'https://t.me/+TKQphsxQyIRhYjBk' }, { text: '🔗 Kampanya Linki', url: 'https://t.me/avcisi_firsat_bot?start=campaign' }],
+      ]);
+      await sendTelegram(env, chatId, lang === 'tr' ? `⚠️ Şehirleri tam anlayamadım. Ama kampanyalara göz at:\n<code>İstanbul - Paris</code> veya <code>New York - Tokyo</code> gibi dene.` : `⚠️ City not found. Try <code>London - Paris</code>`, kb);
       return;
     }
     const [flightLink, hotelLink, carLink, activityLink, trainLink, busLink, photoUrl, rate] = await Promise.all([
