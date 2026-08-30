@@ -154,6 +154,18 @@ export async function handleMessage(message: any, env: Env): Promise<void> {
       return;
     }
 
+    // === KAMPANYA direkt (kampanya yazınca hava değil kampanya gelsin) ===
+    if (text.toLowerCase() === 'kampanya' || text.toLowerCase() === 'kampanyalar') {
+      const r = ['Istanbul - Paris','Berlin - Barcelona','Tokyo - Bangkok','London - New York','Rome - Amsterdam'][Math.floor(Math.random()*5)];
+      const [f, tt] = r.split(' - ');
+      const price = Math.floor(700 + Math.random()*800);
+      const [fl, hl, cl, al, photo] = await Promise.all([searchFlights(env,f,tt,currency), getHotelLink(env,tt,currency), getCarLink(env,tt,currency), getActivitiesLink(env,tt,currency), getDestinationImage(tt)]);
+      const cap = `🔥 <b>KAMPANYA!</b> ${f} → ${tt}\n💰 Sadece <b>${price} ${currency}</b> <s>${Math.round(price*1.4)} ${currency}</s> %30 indirim!\n⏳ Bugün 23:59'a kadar — beyin fırtınası: Hemen tıkla, kaçırma!`;
+      const kb = createTravelKeyboard(fl, hl, cl, al, await getTrainLink(env,f,tt), await getBusLink(env,f,tt));
+      await sendPhoto(env, chatId, photo, cap, kb);
+      return;
+    }
+
     // === MENÜ BUTONLARI (Reply Keyboard) ===
     if (await handleMenuButtons(text, env, chatId, lang, currency)) return;
 
@@ -290,15 +302,16 @@ export async function handleMessage(message: any, env: Env): Promise<void> {
 
 async function handleMenuButtons(text: string, env: Env, chatId: number, lang: string, currency: string): Promise<boolean> {
   const t = text.trim();
-  if (t.includes('Rota Ara') || t.includes('Search Route') || t.includes('Route Suchen')) {
+  const tl = t.toLowerCase();
+  if (tl.includes('rota ara') || tl.includes('search route') || tl.includes('route suchen')) {
     await sendTelegram(env, chatId, lang === 'tr' ? `✈️ Rota yaz lütfen: <code>İstanbul - Paris</code> veya <code>New York - Tokyo</code>\nÖrnekleri kopyalayıp gönderebilirsin.` : `✈️ Type route`, createExploreKeyboard(lang));
     return true;
   }
-  if (t.includes('Günün Bombası') || t.includes("Today's Deal") || t.includes('Tagesangebot')) {
+  if (tl.includes('günün bombası') || tl.includes("today's deal") || tl.includes('tagesangebot')) {
     await handleDailyDeal(env, chatId, lang, currency);
     return true;
   }
-  if (t.includes('Kampanyalar') || t.includes('Deals') || t.includes('Angebote') || t.includes('Kampanya')) {
+  if (tl.includes('kampanyalar') || tl.includes('deals') || tl.includes('angebote') || tl.includes('kampanya')) {
     // Anlık kampanya göster
     const r = ['Istanbul - Paris','Berlin - Barcelona','Tokyo - Bangkok','London - New York','Rome - Amsterdam'][Math.floor(Math.random()*5)];
     const [f, tt] = r.split(' - ');
@@ -309,28 +322,28 @@ async function handleMenuButtons(text: string, env: Env, chatId: number, lang: s
     await sendPhoto(env, chatId, photo, cap, kb);
     return true;
   }
-  if (t.includes('Keşfet') || t.includes('Explore') || t.includes('Entdecken')) {
+  if (tl.includes('keşfet') || tl.includes('explore') || tl.includes('entdecken')) {
     await sendTelegram(env, chatId, lang === 'tr' ? `🌍 <b>Keşfet</b> — ne yapmak istersin?` : `🌍 Explore`, createExploreKeyboard(lang));
     return true;
   }
-  if (t.includes('Takip Ettiklerim') || t.includes('My Tracking') || t.includes('Meine Routen') || t.includes('Takip')) {
+  if (tl.includes('takip ettiklerim') || tl.includes('my tracking') || tl.includes('meine routen') || tl.includes('takip')) {
     await handleFavorites(env, chatId, lang);
     return true;
   }
-  if (t.includes('Fiyat Takibi') || t.includes('Price Alert') || t.includes('Preisalarm')) {
+  if (tl.includes('fiyat takibi') || tl.includes('price alert') || tl.includes('preisalarm')) {
     await handleAlerts(env, chatId, lang);
     return true;
   }
-  if (t.includes('Tren') || t.includes('Otobüs') || t.includes('Train') || t.includes('Bus') || t.includes('Zug')) {
+  if (tl.includes('tren') || tl.includes('otobüs') || tl.includes('train') || tl.includes('bus') || tl.includes('zug')) {
     await sendTelegram(env, chatId, lang === 'tr' ? `🚆 <b>Tren & 🚌 Otobüs</b>\n\nRota yaz: <code>Istanbul - Ankara</code> veya <code>Berlin - Munich</code>\nSana tren ve otobüs butonlarını da göstereceğim. Örnek: <code>Ankara - Istanbul</code>` : `🚆 Train & 🚌 Bus — type route`);
     return true;
   }
-  if (t.includes('Ayarlar') || t.includes('Settings') || t.includes('Einstellungen')) {
+  if (tl.includes('ayarlar') || tl.includes('settings') || tl.includes('einstellungen')) {
     await sendTelegram(env, chatId, lang === 'tr' ? `⚙️ <b>Ayarlar</b> — dil ve para birimini seç:` : `⚙️ Settings`, createLanguageKeyboard());
     setTimeout(()=> sendTelegram(env, chatId, `💱 Para birimi:`, createCurrencyKeyboard()), 600);
     return true;
   }
-  if (t.includes('Yardım') || t.includes('Help') || t.includes('Hilfe')) {
+  if (tl.includes('yardım') || tl.includes('help') || tl.includes('hilfe')) {
     await sendTelegram(env, chatId, UI.helpCaption(lang), createMainMenuKeyboard(lang));
     return true;
   }
