@@ -354,27 +354,45 @@ async function handleWeatherCard(env: Env, chatId: number, city: string, lang: s
   try {
     await sendChatAction(env, chatId, 'upload_photo');
     const coords = getCityCoords(city);
-    const [weather, hotelLink, rate, photoUrl] = await Promise.all([
+    const [weather, hotelLink, bookingLink, carLink, rate, photoUrl] = await Promise.all([
       getWeather(city),
       getHotelLink(env, city, currency),
+      (async () => {
+        const url = `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(city)}&lang=tr`;
+        const { createShortLink } = await import('./db');
+        try {
+          const res = await fetch(`https://api.travelpayouts.com/links/v1/create`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-Access-Token': env.TRAVELPAYOUTS_API_TOKEN },
+            body: JSON.stringify({ trs: Number((env as any).TRAVELPAYOUTS_TRS || 0), marker: isNaN(Number(env.TRAVELPAYOUTS_MARKER)) ? env.TRAVELPAYOUTS_MARKER : Number(env.TRAVELPAYOUTS_MARKER), shorten: true, links: [{ url }] }),
+          });
+          const data: any = await res.json();
+          const affiliate = data?.result?.links?.[0]?.partner_url || url;
+          return await createShortLink(env, affiliate, url);
+        } catch { const { createShortLink } = await import('./db'); return await createShortLink(env, url); }
+      })(),
+      getCarLink(env, city, currency),
       getExchangeRate('EUR', currency),
       getDestinationImage(city),
     ]);
+    // Yüksek kazançlı 3'lü buton: Booking + Hotellook + Araç
+    const kb = createInlineKeyboard([
+      [{ text: '🏨 Booking Oteller', url: bookingLink }, { text: '🏨 Hotellook Otel', url: hotelLink }],
+      [{ text: '🚗 Araç Kirala', url: carLink }, { text: '🎯 Aktiviteler', url: await getActivitiesLink(env, city, currency) }],
+      [{ text: '✈️ Kanalımız', url: 'https://t.me/+TKQphsxQyIRhYjBk' }],
+    ]);
     if (!weather) {
-      const hotelOnly = await getHotelLink(env, city, currency);
       const photo = await getDestinationImage(city);
       const caption = lang === 'tr' ? `🏨 <b>${city}</b> için en iyi otelleri hazırladım` : `🏨 Hotels in <b>${city}</b>`;
-      const kb = createSingleButtonKeyboard(lang === 'tr' ? '🏨 Otelleri Gör' : '🏨 Hotels', hotelOnly);
       const res = await sendPhoto(env, chatId, photo, caption, kb);
-      if (!res?.ok) await sendTelegram(env, chatId, `🏨 <b>${city}</b>`, kb);
+      if (!res?.ok) await sendTelegram(env, chatId, caption, kb);
       return;
     }
     const weatherText = formatWeather(weather, coords?.name || city, lang);
     const rateText = rate ? `\n💱 1 EUR = ${rate.toFixed(2)} ${currency}` : '';
     const caption = `${weatherText}${rateText}\n\n${UI.weatherCaption(city)}`;
-    const kb = createSingleButtonKeyboard(lang === 'tr' ? '🏨 Otelleri Gör' : '🏨 Hotels', hotelLink);
     const res = await sendPhoto(env, chatId, photoUrl, caption, kb);
-    if (!res?.ok) await sendTelegram(env, chatId, `${weatherText}${rateText}\n\n🏨 ${hotelLink}`, kb);
+    if (!res?.ok) await sendTelegram(env, chatId, `${weatherText}${rateText}`, kb);
   } catch (e) {
     console.error('weatherCard', e);
     await sendTelegram(env, chatId, `⚠️ Hava durumu şu an alınamadı, lütfen biraz sonra tekrar deneyin.`);
