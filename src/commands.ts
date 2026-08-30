@@ -569,9 +569,10 @@ async function handleVoiceMessage(message: any, env: Env, chatId: number, lang: 
 }
 
 export async function handleCallbackQuery(callbackQuery: any, env: Env): Promise<void> {
-  const data: string = callbackQuery.data;
+  const data: string = callbackQuery.data || '';
   const chatId = callbackQuery.message?.chat?.id || callbackQuery.from.id;
   const cqId = callbackQuery.id;
+  console.log('callback', data, 'chat', chatId);
   try {
     if (data.startsWith('lang_')) {
       const lang = data.replace('lang_', '');
